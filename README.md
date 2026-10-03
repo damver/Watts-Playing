@@ -64,4 +64,4 @@ If you change a logo, bump `assetVersion` so browsers fetch the new image.
 Please use [Issues](../../issues/new/choose). There's one template for 💡 ideas and wishes and one for 🐛 bugs. For bugs, include your car model and software version.
 
 # Credits
-This project is released under the [MIT License](LICENSE). Weather data comes from [Open-Meteo](https://open-meteo.com). Logos and brand names belong to their respective owners and are only used to make the tiles recognisable. Fonts are under their own licences ([`fonts/LICENSE.txt`](fonts/LICENSE.txt)). This project is not affiliated with Tesla.
+Licensed under [CC BY-NC-ND 4.0](LICENSE): you may share it unchanged with credit, for non-commercial use only. No commercial use, no modified versions. Weather data comes from [Open-Meteo](https://open-meteo.com). Logos and brand names belong to their respective owners and are only used to make the tiles recognisable. Fonts are under their own licences ([`fonts/LICENSE.txt`](fonts/LICENSE.txt)). This project is not affiliated with Tesla.

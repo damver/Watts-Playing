@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inloggen — Watt's Playing</title>
+<style>
+  :root {
+    --bg-a: #0b1020; --bg-b: #131a33; --text: #f4f6fb; --dim: #9aa5bd;
+    --card-border: rgba(255,255,255,.14); --glass: rgba(255,255,255,.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: clamp(20px,4vw,48px);
+    background: linear-gradient(160deg, var(--bg-a), var(--bg-b));
+    color: var(--text); font-family: -apple-system, system-ui, Inter, Arial, sans-serif;
+  }
+  h1 { font-size: clamp(24px,3.4vw,34px); font-weight: 700; margin: 0 0 6px; }
+  .lead { color: var(--dim); font-size: 15px; line-height: 1.55; max-width: 760px; margin: 0 0 30px; }
+  .lead b { color: var(--text); }
+  h2 {
+    font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--dim); margin: 38px 0 14px; display: flex; align-items: center; gap: 10px;
+  }
+  h2 .n { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center;
+          justify-content: center; font-size: 12px; color: #0b1020; font-weight: 800; flex: 0 0 auto; }
+  .tier1 h2 .n { background: #6fe08a; }
+  .tier2 h2 .n { background: #ffd166; }
+  .tier3 h2 .n { background: #7c9cff; }
+  .tier4 h2 .n { background: #6b7280; }
+  .tierhelp { color: var(--dim); font-size: 13px; margin: -8px 0 14px; max-width: 700px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 12px; }
+  .card {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    border-radius: 16px; background: var(--glass); border: 1px solid var(--card-border);
+    text-decoration: none; color: inherit; transition: background .15s ease, transform .15s ease;
+  }
+  .card:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
+  .card img { width: 34px; height: 34px; border-radius: 9px; object-fit: contain; background: #1c2333; padding: 3px; flex: 0 0 auto; }
+  .card .txt { min-width: 0; }
+  .card .naam { font-weight: 650; font-size: 15px; }
+  .card .note { color: var(--dim); font-size: 12.5px; margin-top: 2px; line-height: 1.4; }
+  footer { margin-top: 44px; color: var(--dim); font-size: 12.5px; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+  <h1>Inloggen zonder gedoe</h1>
+  <p class="lead">Eén pagina om te bookmarken. Bij <b>groen</b> hoef je geen wachtwoord te typen op het autoscherm — je krijgt een code via e-mail/sms of een tik-bevestiging op je telefoon. Bij <b>grijs</b> moet je wachtwoord toch getypt worden; dat hoeft dan gelukkig maar één keer, de sessie blijft daarna staan.</p>
+
+  <div class="tier1">
+    <h2><span class="n">✓</span>Zonder wachtwoord — code via e-mail/sms</h2>
+    <p class="tierhelp">Open de link, en kies op de inlogpagina zelf de code-optie in plaats van het wachtwoordveld in te vullen.</p>
+    <div class="grid">
+      <a class="card" href="https://www.netflix.com/login" target="_blank">
+        <img src="../logos/netflix.png" alt=""><div class="txt"><div class="naam">Netflix</div><div class="note">Kies "Stuur inlogcode"</div></div>
+      </a>
+      <a class="card" href="https://accounts.spotify.com/login" target="_blank">
+        <img src="../logos/spotify.png" alt=""><div class="txt"><div class="naam">Spotify</div><div class="note">Toont standaard al een code-optie via mail</div></div>
+      </a>
+      <a class="card" href="https://www.disneyplus.com/login" target="_blank">
+        <img src="../logos/disneyplus.png" alt=""><div class="txt"><div class="naam">Disney+</div><div class="note">Kies de code-optie i.p.v. wachtwoord</div></div>
+      </a>
+      <a class="card" href="https://www.max.com/nl/nl/login" target="_blank">
+        <img src="../logos/hbomax.png" alt=""><div class="txt"><div class="naam">HBO Max</div><div class="note">Klik "Get One-Time Code" bij het wachtwoordveld</div></div>
+      </a>
+      <a class="card" href="https://www.discoveryplus.com/nl/login" target="_blank">
+        <img src="../logos/discoveryplus.png" alt=""><div class="txt"><div class="naam">Discovery+</div><div class="note">Kies "Get a Code Instead"</div></div>
+      </a>
+      <a class="card" href="https://www.skyshowtime.com/nl/login" target="_blank">
+        <img src="../logos/skyshowtime.png" alt=""><div class="txt"><div class="naam">SkyShowtime</div><div class="note">Kies "Inloggen zonder wachtwoord"</div></div>
+      </a>
+      <a class="card" href="https://viaplay.com/nl-nl/activate" target="_blank">
+        <img src="../logos/viaplay.png" alt=""><div class="txt"><div class="naam">Viaplay</div><div class="note">Code staat direct op deze pagina</div></div>
+      </a>
+      <a class="card" href="https://accounts.google.com/" target="_blank">
+        <img src="../logos/youtube.png" alt=""><div class="txt"><div class="naam">YouTube</div><div class="note">Google-prompt: tik "Ja" op je telefoon</div></div>
+      </a>
+      <a class="card" href="https://accounts.google.com/" target="_blank">
+        <img src="../logos/ytmusic.png" alt=""><div class="txt"><div class="naam">YouTube Music</div><div class="note">Zelfde Google-account als YouTube</div></div>
+      </a>
+      <a class="card" href="https://accounts.google.com/" target="_blank">
+        <img src="../logos/gmaps.png" alt=""><div class="txt"><div class="naam">Google Maps</div><div class="note">Zelfde Google-account als YouTube</div></div>
+      </a>
+      <a class="card" href="https://jellyfin.org/docs/general/server/quick-connect/" target="_blank">
+        <img src="../logos/jellyfin.png" alt=""><div class="txt"><div class="naam">Jellyfin</div><div class="note">Quick Connect-code, invoeren op je telefoon</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="tier2">
+    <h2><span class="n">?</span>Waarschijnlijk, nog niet 100% bevestigd</h2>
+    <p class="tierhelp">Kans is groot dat dit werkt, maar niet met zekerheid getest.</p>
+    <div class="grid">
+      <a class="card" href="https://www.twitch.tv/login" target="_blank">
+        <img src="../logos/twitch.png" alt=""><div class="txt"><div class="naam">Twitch</div><div class="note">Log in met Google/Apple/Amazon als dat al actief is</div></div>
+      </a>
+      <a class="card" href="https://www.crunchyroll.com/login" target="_blank">
+        <img src="../logos/crunchyroll.png" alt=""><div class="txt"><div class="naam">Crunchyroll</div><div class="note">Heeft een QR-scan-optie</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="tier3">
+    <h2><span class="n">→</span>Gratis — meestal geen login nodig</h2>
+    <div class="grid">
+      <a class="card" href="https://pluto.tv/" target="_blank">
+        <img src="../logos/pluto.png" alt=""><div class="txt"><div class="naam">Pluto TV</div><div class="note">Direct kijken, geen account nodig</div></div>
+      </a>
+      <a class="card" href="https://tubitv.com/" target="_blank">
+        <img src="../logos/tubi.png" alt=""><div class="txt"><div class="naam">Tubi</div><div class="note">Direct kijken, geen account nodig</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="tier4">
+    <h2><span class="n">⏎</span>Wachtwoord nodig — geen shortcut gevonden</h2>
+    <p class="tierhelp">Eenmalig typen, de Tesla-browser onthoudt de sessie daarna meestal maandenlang.</p>
+    <div class="grid">
+      <a class="card" href="https://www.primevideo.com/" target="_blank">
+        <img src="../logos/primevideo.png" alt=""><div class="txt"><div class="naam">Prime Video</div></div>
+      </a>
+      <a class="card" href="https://www.videoland.com/inloggen" target="_blank">
+        <img src="../logos/videoland.png" alt=""><div class="txt"><div class="naam">Videoland</div></div>
+      </a>
+      <a class="card" href="https://www.plex.tv/sign-in/" target="_blank">
+        <img src="../logos/plex.png" alt=""><div class="txt"><div class="naam">Plex</div><div class="note">Google/Apple-login kan sneller zijn</div></div>
+      </a>
+      <a class="card" href="https://tv.apple.com/" target="_blank">
+        <img src="../logos/appletv.png" alt=""><div class="txt"><div class="naam">Apple TV</div><div class="note">2FA-code verschijnt automatisch op je iPhone</div></div>
+      </a>
+      <a class="card" href="https://music.apple.com/" target="_blank">
+        <img src="../logos/applemusic.png" alt=""><div class="txt"><div class="naam">Apple Music</div><div class="note">Zelfde Apple ID als Apple TV</div></div>
+      </a>
+      <a class="card" href="https://f1tv.formula1.com/" target="_blank">
+        <img src="../logos/f1tv.png" alt=""><div class="txt"><div class="naam">F1 TV</div></div>
+      </a>
+      <a class="card" href="https://www.paramountplus.com/account/signin/" target="_blank">
+        <img src="../logos/paramountplus.png" alt=""><div class="txt"><div class="naam">Paramount+</div></div>
+      </a>
+      <a class="card" href="https://www.peacocktv.com/signin" target="_blank">
+        <img src="../logos/peacock.png" alt=""><div class="txt"><div class="naam">Peacock</div></div>
+      </a>
+      <a class="card" href="https://npo.nl/start/inloggen" target="_blank">
+        <img src="../logos/npostart.png" alt=""><div class="txt"><div class="naam">NPO Start</div></div>
+      </a>
+      <a class="card" href="https://www.espn.com/watch/login" target="_blank">
+        <img src="../logos/espn.png" alt=""><div class="txt"><div class="naam">ESPN</div></div>
+      </a>
+      <a class="card" href="https://www.hulu.com/login" target="_blank">
+        <img src="../logos/hulu.png" alt=""><div class="txt"><div class="naam">Hulu</div></div>
+      </a>
+      <a class="card" href="https://www.bbc.co.uk/iplayer" target="_blank">
+        <img src="../logos/bbciplayer.png" alt=""><div class="txt"><div class="naam">BBC iPlayer</div></div>
+      </a>
+      <a class="card" href="https://www.rakuten.tv/nl/account/login" target="_blank">
+        <img src="../logos/rakuten.png" alt=""><div class="txt"><div class="naam">Rakuten TV</div></div>
+      </a>
+      <a class="card" href="https://vimeo.com/log_in" target="_blank">
+        <img src="../logos/vimeo.png" alt=""><div class="txt"><div class="naam">Vimeo</div></div>
+      </a>
+      <a class="card" href="https://www.dailymotion.com/login" target="_blank">
+        <img src="../logos/dailymotion.png" alt=""><div class="txt"><div class="naam">Dailymotion</div></div>
+      </a>
+      <a class="card" href="#" onclick="return false;">
+        <img src="../logos/emby.png" alt=""><div class="txt"><div class="naam">Emby</div><div class="note">Eigen server-adres invullen</div></div>
+      </a>
+      <a class="card" href="https://soundcloud.com/signin" target="_blank">
+        <img src="../logos/soundcloud.png" alt=""><div class="txt"><div class="naam">SoundCloud</div></div>
+      </a>
+      <a class="card" href="https://login.tidal.com/" target="_blank">
+        <img src="../logos/tidal.png" alt=""><div class="txt"><div class="naam">Tidal</div></div>
+      </a>
+      <a class="card" href="https://www.deezer.com/login" target="_blank">
+        <img src="../logos/deezer.png" alt=""><div class="txt"><div class="naam">Deezer</div></div>
+      </a>
+      <a class="card" href="https://web.strem.io/" target="_blank">
+        <img src="../logos/stremio.png" alt=""><div class="txt"><div class="naam">Stremio</div></div>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <a href="/">← Terug naar Watt's Playing</a> · Samengesteld 30 september 2026, gebaseerd op wat toen klopte — diensten wijzigen dit soms zonder aankondiging.
+  </footer>
+</body>
+</html>

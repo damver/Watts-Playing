@@ -1,0 +1,13 @@
+Lettertypes op deze pagina
+
+tesla.ttf     - Tesla, via dafont.com, aangemerkt als 100% gratis
+inter.woff2   - Inter, SIL Open Font License 1.1
+roboto.woff2  - Roboto, Apache License 2.0
+
+Inter en Roboto zijn hier zelf gehost in plaats van via Google opgehaald,
+zodat de pagina niets extern nodig heeft in de auto.
+
+orbitron.woff2  - Orbitron, SIL Open Font License 1.1
+audiowide.woff2 - Audiowide, SIL Open Font License 1.1
+exo2.woff2      - Exo 2, SIL Open Font License 1.1
+chakra.woff2    - Chakra Petch, SIL Open Font License 1.1

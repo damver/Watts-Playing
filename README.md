@@ -23,13 +23,45 @@ It's been genuinely useful for road trips and Supercharger stops, but I'm sure I
 
 # screenshots
 Media
-![Image Alt](https://github.com/damver/Tesla-Theater---Watt-s-Playing/blob/main/screenhots/media.jpeg?raw=true)
+![Image Alt](screenhots/media.jpeg)
 Games
-![Image Alt](https://github.com/damver/Tesla-Theater---Watt-s-Playing/blob/main/screenhots/games.jpeg?raw=true)
+![Image Alt](screenhots/games.jpeg)
 Other
-![Image Alt](https://github.com/damver/Tesla-Theater---Watt-s-Playing/blob/main/screenhots/others.png?raw=true)
+![Image Alt](screenhots/others.png)
 News
-![Image Alt](https://github.com/damver/Tesla-Theater---Watt-s-Playing/blob/main/screenhots/news.png?raw=true)
+![Image Alt](screenhots/news.png)
 
 see all: 
-https://github.com/damver/Tesla-Theater---Watt-s-Playing/tree/main/screenhots
+[screenhots/](screenhots/)
+
+# Run it yourself
+It's a static site, so any web server works. You need HTTPS if you want weather for your current location, because the Tesla browser only allows geolocation over HTTPS.
+
+```bash
+python3 -m http.server 8080   # quickest test
+```
+
+For the full setup (nginx + news proxy), see [`deploy/`](deploy/):
+- `nginx-theater.conf`: site config, with no-cache on `index.html` / `services.json`
+- `news/news.py` + `wattsplaying-news.service`: small RSS proxy with SSRF protection (Python stdlib only, port 8098)
+
+All personal settings (tile order, hidden tiles, background, fonts, saved places) are stored in your own browser's localStorage. There are no accounts, and nothing is sent to a server.
+
+# Adding a service
+Every tile is defined in [`services.json`](services.json). Adding one takes a single line:
+```json
+{ "name": "My site", "url": "https://example.com", "logo": "logos/mysite.png", "hidden": true }
+```
+If you change a logo, bump `assetVersion` so browsers fetch the new image.
+
+# Tesla browser quirks (learned the hard way)
+- The browser viewport is only about 1100–1400 CSS px wide, even though the panel is 2200×1300.
+- Geolocation only works over HTTPS, and `watchPosition` crashes the tab. Use `getCurrentPosition` on a timer instead.
+- Chromium "font boosting" inflates body text; `-webkit-text-size-adjust: 100%` stops it.
+- Streaming only works while parked.
+
+# Ideas & bugs
+Please use [Issues](../../issues/new/choose). There's one template for 💡 ideas and wishes and one for 🐛 bugs. For bugs, include your car model and software version.
+
+# Credits
+Weather data comes from [Open-Meteo](https://open-meteo.com). Logos and brand names belong to their respective owners and are only used to make the tiles recognisable. Fonts are under their own licences ([`fonts/LICENSE.txt`](fonts/LICENSE.txt)). This project is not affiliated with Tesla.

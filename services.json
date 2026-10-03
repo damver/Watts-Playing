@@ -1,0 +1,316 @@
+{
+  "title": "Watt's Playing",
+  "assetVersion": 1790536341139,
+  "fullscreen": true,
+  "weather": {
+    "lat": 52.09,
+    "lon": 5.12
+  },
+  "services": [
+    {
+      "name": "YouTube",
+      "url": "https://www.youtube.com",
+      "logo": "logos/youtube.png"
+    },
+    {
+      "name": "Netflix",
+      "url": "https://www.netflix.com",
+      "logo": "logos/netflix.png"
+    },
+    {
+      "name": "Disney+",
+      "url": "https://www.disneyplus.com",
+      "logo": "logos/disneyplus.png"
+    },
+    {
+      "name": "Prime Video",
+      "url": "https://www.primevideo.com",
+      "logo": "logos/primevideo.png"
+    },
+    {
+      "name": "Videoland",
+      "url": "https://www.videoland.com",
+      "logo": "logos/videoland.png"
+    },
+    {
+      "name": "Plex",
+      "url": "https://app.plex.tv",
+      "logo": "logos/plex.png"
+    },
+    {
+      "name": "Twitch",
+      "url": "https://www.twitch.tv",
+      "logo": "logos/twitch.png"
+    },
+    {
+      "name": "HBO Max",
+      "url": "https://www.hbomax.com",
+      "logo": "logos/hbomax.png",
+      "hidden": true
+    },
+    {
+      "name": "Apple TV",
+      "url": "https://tv.apple.com",
+      "logo": "logos/appletv.png",
+      "hidden": true
+    },
+    {
+      "name": "F1 TV",
+      "url": "https://f1tv.formula1.com",
+      "logo": "logos/f1tv.png",
+      "hidden": true
+    },
+    {
+      "name": "Paramount+",
+      "url": "https://www.paramountplus.com",
+      "logo": "logos/paramountplus.png",
+      "hidden": true
+    },
+    {
+      "name": "Peacock",
+      "url": "https://www.peacocktv.com",
+      "logo": "logos/peacock.png",
+      "hidden": true
+    },
+    {
+      "name": "SkyShowtime",
+      "url": "https://www.skyshowtime.com",
+      "logo": "logos/skyshowtime.png",
+      "hidden": true
+    },
+    {
+      "name": "Viaplay",
+      "url": "https://viaplay.nl",
+      "logo": "logos/viaplay.png",
+      "hidden": true
+    },
+    {
+      "name": "NPO Start",
+      "url": "https://npo.nl",
+      "logo": "logos/npostart.png",
+      "hidden": true
+    },
+    {
+      "name": "ESPN",
+      "url": "https://www.espn.nl",
+      "logo": "logos/espn.png",
+      "hidden": true
+    },
+    {
+      "name": "Discovery+",
+      "url": "https://www.discoveryplus.com",
+      "logo": "logos/discoveryplus.png",
+      "hidden": true
+    },
+    {
+      "name": "Crunchyroll",
+      "url": "https://www.crunchyroll.com",
+      "logo": "logos/crunchyroll.png",
+      "hidden": true
+    },
+    {
+      "name": "Hulu",
+      "url": "https://www.hulu.com",
+      "logo": "logos/hulu.png",
+      "hidden": true
+    },
+    {
+      "name": "BBC iPlayer",
+      "url": "https://www.bbc.co.uk/iplayer",
+      "logo": "logos/bbciplayer.png",
+      "hidden": true
+    },
+    {
+      "name": "Rakuten TV",
+      "url": "https://rakuten.tv",
+      "logo": "logos/rakuten.png",
+      "hidden": true
+    },
+    {
+      "name": "Pluto TV",
+      "url": "https://pluto.tv",
+      "logo": "logos/pluto.png",
+      "hidden": true
+    },
+    {
+      "name": "Tubi",
+      "url": "https://tubitv.com",
+      "logo": "logos/tubi.png",
+      "hidden": true
+    },
+    {
+      "name": "Vimeo",
+      "url": "https://vimeo.com",
+      "logo": "logos/vimeo.png",
+      "hidden": true
+    },
+    {
+      "name": "Dailymotion",
+      "url": "https://www.dailymotion.com",
+      "logo": "logos/dailymotion.png",
+      "hidden": true
+    },
+    {
+      "name": "Jellyfin",
+      "url": "https://jellyfin.org",
+      "logo": "logos/jellyfin.png",
+      "hidden": true
+    },
+    {
+      "name": "Emby",
+      "url": "https://app.emby.media",
+      "logo": "logos/emby.png",
+      "hidden": true
+    },
+    {
+      "name": "Spotify",
+      "url": "https://open.spotify.com",
+      "logo": "logos/spotify.png",
+      "hidden": true
+    },
+    {
+      "name": "Apple Music",
+      "url": "https://music.apple.com",
+      "logo": "logos/applemusic.png",
+      "hidden": true
+    },
+    {
+      "name": "YouTube Music",
+      "url": "https://music.youtube.com",
+      "logo": "logos/ytmusic.png",
+      "hidden": true
+    },
+    {
+      "name": "SoundCloud",
+      "url": "https://soundcloud.com",
+      "logo": "logos/soundcloud.png",
+      "hidden": true
+    },
+    {
+      "name": "Tidal",
+      "url": "https://listen.tidal.com",
+      "logo": "logos/tidal.png",
+      "hidden": true
+    },
+    {
+      "name": "Deezer",
+      "url": "https://www.deezer.com",
+      "logo": "logos/deezer.png",
+      "hidden": true
+    },
+    {
+      "name": "Google Maps",
+      "url": "https://maps.google.com",
+      "logo": "logos/gmaps.png",
+      "hidden": true
+    },
+    {
+      "name": "Stremio",
+      "url": "https://web.strem.io/",
+      "logo": "logos/stremio.png"
+    }
+  ],
+  "games": [
+    {
+      "name": "Woordle",
+      "url": "https://woordle.nl/",
+      "logo": "games/woordle.png"
+    },
+    {
+      "name": "2048",
+      "url": "https://2048.nl/",
+      "logo": "games/2048nl.png"
+    },
+    {
+      "name": "Sudoku",
+      "url": "https://www.sudokuonline.nl/",
+      "logo": "games/sudokunl.png"
+    },
+    {
+      "name": "Patience",
+      "url": "https://www.patience.nl/",
+      "logo": "games/patience.png"
+    },
+    {
+      "name": "Mahjong",
+      "url": "https://www.mahjongspelen.nl/",
+      "logo": "games/mahjong.png"
+    },
+    {
+      "name": "Schaken",
+      "url": "https://lichess.org/?lang=nl",
+      "logo": "games/schaken.png"
+    },
+    {
+      "name": "Quick Draw",
+      "url": "https://quickdraw.withgoogle.com/?locale=nl",
+      "logo": "games/quickdraw.png"
+    },
+    {
+      "name": "Flappy Bird",
+      "url": "https://flappybird.io",
+      "logo": "games/flappy.png"
+    },
+    {
+      "name": "Little Alchemy 2",
+      "url": "https://littlealchemy2.com/",
+      "logo": "games/alchemy.png"
+    },
+    {
+      "name": "Chrome Dino",
+      "url": "https://chromedino.com/",
+      "logo": "games/dino.png"
+    },
+    {
+      "name": "Mijnenveger",
+      "url": "https://minesweeper.online/",
+      "logo": "games/minesweeper.png"
+    },
+    {
+      "name": "Slither.io",
+      "url": "https://slither.io/",
+      "logo": "games/slither.png"
+    },
+    {
+      "name": "Polderprikker",
+      "url": "https://polderprikker.nl",
+      "logo": "games/polderprikker.png"
+    },
+    {
+      "name": "Verbandle",
+      "url": "https://verbandle.nl/",
+      "logo": "games/verbandle.png"
+    },
+    {
+      "name": "Jowua Games",
+      "url": "https://jowua-games.vercel.app/",
+      "logo": "games/jowua.png"
+    }
+  ],
+  "other": [
+    {
+      "name": "Chargemap",
+      "url": "https://chargemap.com/map",
+      "logo": "logos/chargemap.png",
+      "icon": true
+    },
+    {
+      "name": "ABRP",
+      "url": "https://abetterrouteplanner.com/",
+      "logo": "logos/abrp.png",
+      "icon": true
+    },
+    {
+      "name": "ANWB Verkeer",
+      "url": "https://www.anwb.nl/verkeer",
+      "logo": "logos/anwb.png",
+      "icon": true
+    },
+    {
+      "name": "Buienradar",
+      "url": "https://www.buienradar.nl/",
+      "logo": "logos/buienradar.png",
+      "icon": true
+    }
+  ]
+}

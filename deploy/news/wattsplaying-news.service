@@ -1,0 +1,14 @@
+[Unit]
+Description=WattsPlaying nieuws-proxy (SSRF-veilig)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/wattsplaying-news/news.py
+Restart=on-failure
+RestartSec=5
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

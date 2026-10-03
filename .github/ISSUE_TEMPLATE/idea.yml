@@ -1,0 +1,20 @@
+name: 💡 Idea / wish
+description: A service, game or feature you'd like to see
+labels: [idea]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of idea?
+      options: [New service/tile, New game, New feature, Improve something existing, Other]
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like?
+      description: For a service or game, please include a link.
+    validations: { required: true }
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would this be useful (e.g. while charging)?

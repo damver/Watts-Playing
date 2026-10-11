@@ -1,0 +1,14 @@
+[Unit]
+Description=WattsPlaying stuur-naar-auto (alleen in geheugen)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/wattsplaying-stuur/stuur.py
+Restart=on-failure
+RestartSec=5
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

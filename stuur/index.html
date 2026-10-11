@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070c">
+<title>Stuur naar auto — Watt's Playing</title>
+<style>
+  @font-face { font-family: 'TeslaTitle'; src: url('/fonts/tesla.ttf') format('truetype'); font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+  :root {
+    --bg: #07070c; --text: #f4f5f8; --dim: rgba(244,245,248,.56);
+    --glass-fill: rgba(255,255,255,.085); --glass-edge: rgba(255,255,255,.16); --glass-rim: rgba(255,255,255,.55);
+    --ok: #6fe08a; --err: #ff8a80;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; min-height: 100dvh; color: var(--text); background: var(--bg);
+    font: 16px/1.5 'Inter', -apple-system, system-ui, Roboto, Arial, sans-serif;
+    padding: max(22px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  }
+  /* zelfde achtergrond en sluier als de autopagina */
+  body::before, body::after { content: ""; position: fixed; inset: 0; z-index: -1; }
+  body::before { background: url('/bg/road.jpg') center/cover no-repeat; }
+  body::after { background: linear-gradient(180deg, rgba(4,4,8,.62) 0%, rgba(4,4,8,.42) 40%, rgba(4,4,8,.78) 100%); }
+  main { max-width: 460px; margin: 0 auto; }
+  .glass {
+    background: var(--glass-fill); border: 1px solid var(--glass-edge);
+    -webkit-backdrop-filter: blur(30px) saturate(175%); backdrop-filter: blur(30px) saturate(175%);
+    box-shadow: inset 0 1px 0 0 var(--glass-rim), inset 0 -1px 0 0 rgba(255,255,255,.05), 0 12px 40px rgba(0,0,0,.42);
+  }
+  header { text-align: center; margin: 6px 0 22px; }
+  .merk { font-family: 'TeslaTitle', -apple-system, system-ui, sans-serif; font-size: 25px; letter-spacing: .07em; text-transform: uppercase; margin: 0; }
+  .pil { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 7px 14px 7px 10px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .pil svg { width: 18px; height: 18px; }
+  .lead { color: var(--dim); text-align: center; margin: 14px 8px 0; font-size: 15px; }
+  .kaart { border-radius: 26px; padding: 18px; margin-bottom: 14px; }
+  label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin: 0 2px 10px; }
+  input, textarea {
+    width: 100%; color: var(--text); background: rgba(0,0,0,.28); border: 1px solid var(--glass-edge);
+    border-radius: 16px; padding: 14px 16px; font: inherit; font-size: 17px; outline: none; transition: border-color .15s;
+  }
+  input::placeholder, textarea::placeholder { color: rgba(244,245,248,.32); }
+  input:focus, textarea:focus { border-color: rgba(255,255,255,.55); }
+  #code { font-size: 30px; font-weight: 700; letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; text-align: center; font-variant-numeric: tabular-nums; padding: 12px; }
+  textarea { min-height: 92px; resize: vertical; }
+  .rij { display: flex; gap: 10px; margin-top: 12px; }
+  button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 54px; border-radius: 999px; border: 1px solid var(--glass-edge); padding: 0 20px;
+    font: inherit; font-weight: 600; color: var(--text); background: rgba(255,255,255,.085); cursor: pointer;
+    transition: transform .14s ease, opacity .15s;
+  }
+  button svg { width: 20px; height: 20px; flex: none; }
+  button:active { transform: scale(.95); }
+  button.hoofd { flex: 1; background: rgba(255,255,255,.92); color: #0a0a10; border-color: transparent; font-size: 17px; }
+  button:disabled { opacity: .45; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid rgba(255,255,255,.8); outline-offset: 2px; }
+  #melding { min-height: 24px; margin: 10px 4px 0; font-weight: 600; text-align: center; }
+  #melding.ok { color: var(--ok); } #melding.fout { color: var(--err); }
+  .geschiedenis { list-style: none; margin: 0; padding: 0; }
+  .geschiedenis li { padding: 12px 2px; border-top: 1px solid rgba(255,255,255,.1); color: var(--dim); font-size: 14px; cursor: pointer;
+                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .geschiedenis li:first-child { border-top: 0; padding-top: 2px; }
+  .klein { color: var(--dim); font-size: 13px; margin: 18px 12px 0; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="merk">Watt's Playing</p>
+    <div class="pil glass">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="9" height="16" rx="2"/><path d="M14 12h8M18.5 8.5 22 12l-3.5 3.5"/></svg>
+      Stuur naar auto
+    </div>
+    <p class="lead">Open in de auto Watt's Playing en tik op het telefoon-icoon voor de code.</p>
+  </header>
+
+  <div class="kaart glass">
+    <label for="code">Code uit de auto</label>
+    <input id="code" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="6" placeholder="ABC123">
+  </div>
+
+  <form class="kaart glass" id="form">
+    <label for="link">Link</label>
+    <textarea id="link" placeholder="Plak hier een link, bijv. een YouTube-video" autocomplete="off" spellcheck="false"></textarea>
+    <div class="rij">
+      <button type="button" id="plak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>Plakken</button>
+      <button type="submit" class="hoofd" id="stuur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z"/></svg>Versturen</button>
+    </div>
+    <div id="melding" role="status"></div>
+  </form>
+
+  <div class="kaart glass" id="geschKaart" hidden>
+    <label>Eerder gestuurd</label>
+    <ul class="geschiedenis" id="gesch"></ul>
+  </div>
+
+  <p class="klein">Er wordt niets bewaard: de link staat alleen even klaar tot de auto hem ophaalt.</p>
+</main>
+<script>
+(function () {
+  var KEY = 'wattsplaying.stuur';
+  var codeEl = document.getElementById('code'), linkEl = document.getElementById('link');
+  var meld = document.getElementById('melding'), knop = document.getElementById('stuur');
+  var st = {};
+  try { st = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  st.gesch = st.gesch || [];
+  function bewaar() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+
+  function schoon(c) { return (c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); }
+  function toonCode(c) { codeEl.value = c.length > 3 ? c : c; }
+  var uitUrl = schoon(new URLSearchParams(location.search).get('c'));
+  if (uitUrl) { st.code = uitUrl; bewaar(); history.replaceState(null, '', location.pathname); }
+  toonCode(st.code || '');
+  codeEl.addEventListener('input', function () { var c = schoon(codeEl.value); toonCode(c); st.code = c; bewaar(); });
+
+  // Gedeelde tekst bevat vaak meer dan de link ("Kijk dit! https://youtu.be/...").
+  function vindLink(tekst) {
+    var m = (tekst || '').match(/https?:\/\/[^\s<>"']+/i);
+    if (m) return m[0];
+    var t = (tekst || '').trim();
+    return /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(t) ? 'https://' + t : null;
+  }
+  function melding(tekst, soort) { meld.textContent = tekst; meld.className = soort || ''; }
+
+  function toonGesch() {
+    var ul = document.getElementById('gesch');
+    ul.innerHTML = '';
+    document.getElementById('geschKaart').hidden = !st.gesch.length;
+    st.gesch.forEach(function (u) {
+      var li = document.createElement('li');
+      li.textContent = u;
+      li.addEventListener('click', function () { linkEl.value = u; });
+      ul.appendChild(li);
+    });
+  }
+  toonGesch();
+
+  document.getElementById('plak').addEventListener('click', function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) { linkEl.focus(); melding('Houd het veld ingedrukt en kies Plakken.'); return; }
+    navigator.clipboard.readText().then(function (t) { linkEl.value = t; melding(''); })
+      .catch(function () { linkEl.focus(); melding('Plakken mag niet, houd het veld ingedrukt en kies Plakken.'); });
+  });
+
+  document.getElementById('form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var code = schoon(codeEl.value), url = vindLink(linkEl.value);
+    if (code.length !== 6) { melding('Vul de 6-tekens-code uit de auto in.', 'fout'); codeEl.focus(); return; }
+    if (!url) { melding('Dat lijkt geen link.', 'fout'); linkEl.focus(); return; }
+    knop.disabled = true;
+    melding('Versturen…');
+    fetch('/api/stuur/' + code, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url })
+    }).then(function (r) {
+      if (r.status === 404) throw new Error('Code verlopen. Open het stuur-scherm in de auto en scan opnieuw.');
+      if (!r.ok) return r.json().then(function (j) { throw new Error(j.error || 'Versturen mislukt.'); });
+      melding('Verstuurd! Hij opent nu in de auto.', 'ok');
+      linkEl.value = '';
+      st.gesch = [url].concat(st.gesch.filter(function (u) { return u !== url; })).slice(0, 5);
+      bewaar(); toonGesch();
+    }).catch(function (e) {
+      melding(e.message && e.message.indexOf('fetch') < 0 ? e.message : 'Geen verbinding.', 'fout');
+    }).then(function () { knop.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

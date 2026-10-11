@@ -17,6 +17,8 @@ Timer + world clocks — hidden behind the clock tile, handy while waiting at a 
 Games tab — but only stuff you can actually play with taps/swipes, no keyboard-dependent games
 News tab — headlines from a few sources, tap to read
 Customizable fonts & backgrounds
+Charging break — tap the coffee cup to see food, coffee, groceries and toilets within walking distance of where you're parked (OpenStreetMap data via Photon)
+Send to car — scan the QR code with your phone (or go to `/s` and type the 6-character code), paste a link, and it opens on the car screen right away
 
 # Help me
 It's been genuinely useful for road trips and Supercharger stops, but I'm sure I'm missing obvious ideas. What would you want on a screen like this? Anything from small quality-of-life stuff to whole new sections. Happy to hear what other Tesla owners actually want while parked/charging.
@@ -44,8 +46,9 @@ python3 -m http.server 8080   # quickest test
 For the full setup (nginx + news proxy), see [`deploy/`](deploy/):
 - `nginx-theater.conf`: site config, with no-cache on `index.html` / `services.json`
 - `news/news.py` + `wattsplaying-news.service`: small RSS proxy with SSRF protection (Python stdlib only, port 8098)
+- `stuur/stuur.py` + `wattsplaying-stuur.service`: the send-to-car relay (Python stdlib only, port 8099). Everything lives in memory: a link waits only until the car picks it up, and codes expire 10 minutes after the car stops polling. `python3 stuur.py --test` runs a self-check.
 
-All personal settings (tile order, hidden tiles, background, fonts, saved places) are stored in your own browser's localStorage. There are no accounts, and nothing is sent to a server.
+All personal settings (tile order, hidden tiles, background, fonts, saved places) are stored in your own browser's localStorage. There are no accounts. The only things that leave your browser are the weather/news/places lookups and, when you use Send to car, the link you send (held in memory until the car fetches it, never stored).
 
 # Adding a service
 Every tile is defined in [`services.json`](services.json). Adding one takes a single line:
@@ -64,4 +67,4 @@ If you change a logo, bump `assetVersion` so browsers fetch the new image.
 Please use [Issues](../../issues/new/choose). There's one template for 💡 ideas and wishes and one for 🐛 bugs. For bugs, include your car model and software version.
 
 # Credits
-© 2026 Damver. Licensed under [CC BY-NC-ND 4.0](LICENSE): you may share it unchanged, with credit, for non-commercial use only. No commercial use and no modified versions. Third-party logos, trademarks and fonts are not covered by this licence. Weather data comes from [Open-Meteo](https://open-meteo.com). Logos and brand names belong to their respective owners and are only used to make the tiles recognisable. Fonts are under their own licences ([`fonts/LICENSE.txt`](fonts/LICENSE.txt)). This project is not affiliated with Tesla.
+© 2026 Damver. Licensed under [CC BY-NC-ND 4.0](LICENSE): you may share it unchanged, with credit, for non-commercial use only. No commercial use and no modified versions. Third-party logos, trademarks and fonts are not covered by this licence. Weather data comes from [Open-Meteo](https://open-meteo.com). Places near the charger come from [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors via [Photon](https://photon.komoot.io). QR codes are drawn with [qrcodejs](https://github.com/davidshimjs/qrcodejs) (MIT). Logos and brand names belong to their respective owners and are only used to make the tiles recognisable. Fonts are under their own licences ([`fonts/LICENSE.txt`](fonts/LICENSE.txt)). This project is not affiliated with Tesla.

@@ -671,19 +671,33 @@
      draaien geeft een wiskundig naadloze cyclus (0deg en 360deg zien
      er identiek uit) — geen sprong of harde band zoals bij het
      verschuiven van background-position door een gewone gradient. */
-  @keyframes rainbowSpin {
-    0%   { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
+  /* nagemaakt van YouTube "Colors Of Rainbow – Smooth Speed" (VpOxYPZ3B-s): één egale
+     kleur over het hele scherm die door de regenboog loopt, 50% doorzichtig. Nu alleen nog
+     overbrugging tijdens het laden van de video en terugval zonder internet. */
+  @keyframes rainbowKleur {
+    0%   { background-color: #ff0000; }
+    16.6% { background-color: #ff8a00; }
+    33.3% { background-color: #ffee00; }
+    50%  { background-color: #00d43a; }
+    66.6% { background-color: #0077ff; }
+    83.3% { background-color: #c800d6; }
+    100% { background-color: #ff0000; }
   }
   body.rainbow::after {
     content: ''; position: fixed; inset: 0; z-index: 500; pointer-events: none;
-    background: conic-gradient(from 0deg,
-      #ff2d55, #ff9500, #ffe600, #34d058, #00c2ff, #5b5bff, #c04dff, #ff2d55);
-    animation: rainbowSpin 4s linear infinite;
-    mix-blend-mode: screen; opacity: .55;
+    animation: rainbowKleur 4s linear infinite;
+    opacity: .5;
     transition: opacity .6s ease;
   }
   body.rainbow.rainbow-out::after { opacity: 0; }
+  /* met internet: YouTube "Rainbow Screen Change" op 2x (YouTube-maximum), half doorzichtig.
+     De CSS-kleurwissel hierboven overbrugt het laden en is de terugval zonder internet. */
+  .rb-laag { position: fixed; inset: 0; z-index: 500; overflow: hidden; pointer-events: none;
+             opacity: .5; transition: opacity .6s ease; }
+  .rb-laag iframe { position: absolute; top: 50%; left: 50%; border: 0;
+             width: max(100vw, 177.78vh); height: max(56.25vw, 100vh); transform: translate(-50%, -50%); }
+  body.rainbow-out .rb-laag { opacity: 0; }
+  body.rb-video.rainbow::after { display: none; }
   @media (prefers-reduced-motion: reduce) {
     body.rainbow::after { animation: none; filter: none; }
     .bolt-spark { animation: none; opacity: 0; }
@@ -770,6 +784,153 @@
     background: rgba(180,40,40,.18); border: 1px solid rgba(255,120,120,.35);
     color: #ffc9c9; font-size: 15px; line-height: 1.5;
   }
+
+  /* ---- sfeermodus: knop linksonder met uitklapmenu + schermvullende scènes ---- */
+  .sfeer-wrap {
+    position: fixed; left: clamp(16px,2.2vw,34px); bottom: clamp(16px,2.2vw,34px);
+    z-index: 110; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 10px;
+  }
+  body.editing .sfeer-wrap { display: none; }
+  footer { padding-left: calc(clamp(50px,6.4vh,62px) + 14px); }
+  .sfeer-menu {
+    display: flex; flex-direction: column; gap: 4px; padding: 8px; border-radius: 28px;
+    transform-origin: bottom left; transform: translateY(10px) scale(.96);
+    opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .22s ease;
+  }
+  .sfeer-wrap.open .sfeer-menu { opacity: 1; transform: none; pointer-events: auto; }
+  .sfeer-wrap.open #sfeerBtn { background: rgba(255,255,255,.88); color: #0a0a10; border-color: transparent; }
+  .sfeer-opt {
+    display: flex; align-items: center; gap: 12px; min-height: clamp(50px,6.4vh,58px);
+    padding: 0 22px 0 10px; border-radius: 999px; border: 0; background: transparent;
+    color: var(--text); font: inherit; font-size: clamp(14px,1.2vw,17px); font-weight: 560;
+    cursor: pointer; text-align: left; white-space: nowrap;
+  }
+  .sfeer-opt:hover, .sfeer-opt:focus-visible { background: rgba(255,255,255,.1); outline: none; }
+  .sfeer-opt .ico {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; background: var(--c);
+  }
+  .sfeer-opt .ico svg { width: 19px; height: 19px; }
+
+  .sfeer { position: fixed; inset: 0; z-index: 300; background: #000; animation: fadeIn .6s ease; }
+  .sfeer[hidden] { display: none !important; }
+  .sfeer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .sfeer-video {
+    position: absolute; top: 50%; left: 50%; border: 0; pointer-events: none;
+    width: max(100vw, 177.78vh); height: max(56.25vw, 100vh);
+    transform: translate(-50%, -50%);
+  }
+  .sfeer-klok {
+    position: absolute; top: clamp(18px,3vh,36px); left: 0; right: 0; text-align: center;
+    font-size: clamp(30px,4.4vw,60px); font-weight: 300; letter-spacing: -.02em;
+    color: rgba(255,255,255,.85); text-shadow: 0 2px 20px rgba(0,0,0,.55);
+    font-variant-numeric: tabular-nums; pointer-events: none;
+  }
+  .sfeer-bar {
+    position: absolute; left: 50%; bottom: clamp(16px,2.2vw,34px); transform: translateX(-50%);
+    display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 999px;
+    transition: opacity .35s ease;
+  }
+  .sfeer.rust .sfeer-bar { opacity: 0; pointer-events: none; }
+  body.timing .sfeer-bar, body.tmpauze .sfeer-bar { bottom: calc(clamp(16px,2.2vw,34px) + 66px); }
+  .sfeer-vol {
+    -webkit-appearance: none; appearance: none; width: clamp(110px, 13vw, 180px); height: 44px;
+    background: transparent; cursor: pointer; margin: 0 4px; --pct: 80%;
+  }
+  .sfeer-vol::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 3px;
+    background: linear-gradient(90deg, rgba(255,255,255,.9) var(--pct), rgba(255,255,255,.22) var(--pct));
+  }
+  .sfeer-vol::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.4);
+  }
+  .sfeer-vol:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 8px; }
+  #sfeerMute.stil + .sfeer-vol { opacity: .45; }
+  .sfeer-naam { padding: 0 12px; font-weight: 600; font-size: clamp(14px,1.2vw,17px); white-space: nowrap; }
+  #sfeerMute .uit { display: none; }
+  #sfeerMute.stil .aan { display: none; }
+  #sfeerMute.stil .uit { display: block; }
+  @media (prefers-reduced-motion: reduce) {
+    .sfeer-menu { transition: none; }
+  }
+
+  /* ---- laadpauze + stuur naar auto ---- */
+  footer { padding-right: calc(4 * 72px); }
+  #lpBtn, #stBtn { display: inline-flex; }
+  body.editing #lpBtn, body.editing #stBtn { display: none; }
+  #stBtn .dot {
+    position: absolute; top: 9px; right: 9px; width: 9px; height: 9px; border-radius: 50%;
+    background: #6fe08a; box-shadow: 0 0 0 2px rgba(0,0,0,.4); display: none;
+  }
+  #stBtn { position: relative; }
+  #stBtn.actief .dot { display: block; }
+
+  .lp-title, .st-title { font-size: clamp(24px,2.8vw,34px); font-weight: 650; letter-spacing: -.02em; }
+  .lp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px; }
+  .lp-chip {
+    min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--glass-edge);
+    background: rgba(255,255,255,.06); color: var(--text); font: inherit;
+    font-size: clamp(13px,1.15vw,15px); font-weight: 560; cursor: pointer;
+  }
+  .lp-chip.on { background: rgba(255,255,255,.88); color: #0a0a10; border-color: transparent; }
+  .lp-chip .n { opacity: .6; margin-left: 4px; }
+  .lp-lijst { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .lp-item {
+    display: flex; align-items: center; gap: 14px; padding: 12px 16px; min-height: 64px;
+    border-radius: 18px; background: rgba(255,255,255,.05); border: 1px solid var(--glass-edge);
+    color: var(--text); text-decoration: none;
+  }
+  .lp-item:active { transform: scale(.99); }
+  .lp-ico {
+    width: 40px; height: 40px; border-radius: 50%; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center; background: var(--c);
+  }
+  .lp-ico svg { width: 20px; height: 20px; }
+  .lp-wat { flex: 1; min-width: 0; }
+  .lp-naam { font-weight: 600; font-size: clamp(14px,1.3vw,17px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lp-soort { color: var(--dim); font-size: clamp(12px,1.1vw,14px); }
+  .lp-afst { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lp-afst b { display: block; font-size: clamp(14px,1.3vw,17px); }
+  .lp-afst span { color: var(--dim); font-size: clamp(12px,1.1vw,14px); }
+  .lp-msg { color: var(--dim); padding: 18px 4px; font-size: clamp(13px,1.2vw,16px); }
+  .lp-bron { color: var(--dim); font-size: 11px; margin-top: 14px; opacity: .7; }
+
+  .st-body { display: flex; gap: clamp(20px,3vw,40px); align-items: center; margin-top: 14px; flex-wrap: wrap; }
+  .st-qr {
+    background: #fff; padding: 14px; border-radius: 18px; line-height: 0;
+    width: clamp(170px,18vw,230px); height: clamp(170px,18vw,230px); flex: 0 0 auto;
+  }
+  .st-qr img, .st-qr canvas { width: 100% !important; height: 100% !important; }
+  .st-info { flex: 1; min-width: 240px; }
+  .st-uitleg { color: var(--dim); font-size: clamp(13px,1.2vw,16px); line-height: 1.5; }
+  .st-uitleg b { color: var(--text); }
+  .st-code {
+    font-size: clamp(38px,4.6vw,58px); font-weight: 700; letter-spacing: .12em; margin: 10px 0 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .st-status { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: clamp(13px,1.2vw,15px); }
+  .st-status i { width: 9px; height: 9px; border-radius: 50%; background: #6fe08a; animation: stPuls 1.6s ease-in-out infinite; }
+  .st-status.fout i { background: #ff8a80; animation: none; }
+  @keyframes stPuls { 50% { opacity: .25; } }
+  .st-lijst { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+
+  .st-toast {
+    position: fixed; left: 50%; top: clamp(16px,3vh,32px); transform: translateX(-50%);
+    z-index: 260; display: flex; align-items: center; gap: 14px;
+    padding: 10px 10px 10px 18px; border-radius: 999px; max-width: min(720px, calc(100vw - 32px));
+    animation: rise .26s cubic-bezier(.2,.8,.3,1);
+  }
+  .st-toast[hidden] { display: none; }
+  .st-toast svg { width: 22px; height: 22px; flex: 0 0 auto; }
+  .st-toast .wat { min-width: 0; }
+  .st-toast .k { color: var(--dim); font-size: 12px; }
+  .st-toast .t { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .st-open {
+    min-height: 48px; padding: 0 22px; border-radius: 999px; border: 0; cursor: pointer;
+    background: rgba(255,255,255,.9); color: #0a0a10; font: inherit; font-weight: 650;
+  }
+  .st-x { width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; color: var(--text); font-size: 24px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -985,6 +1146,82 @@
   </div>
 </div>
 
+
+<!-- sfeermodus: knop linksonder + schermvullende scène -->
+<div class="sfeer-wrap" id="sfeerWrap">
+  <button class="btn icon glass" id="sfeerBtn" aria-expanded="false" aria-controls="sfeerMenu" title="Sfeermodus" aria-label="Sfeermodus">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/>
+    </svg>
+  </button>
+  <div class="sfeer-menu glass" id="sfeerMenu" role="menu"></div>
+</div>
+<div class="sfeer" id="sfeer" hidden>
+  <canvas id="sfeerCanvas"></canvas>
+  <div class="sfeer-klok" id="sfeerKlok"></div>
+  <div class="sfeer-bar glass" id="sfeerBar">
+    <button class="btn icon glass" id="sfeerMute" aria-label="Geluid">
+      <svg class="aan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      <svg class="uit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
+    </button>
+    <input type="range" class="sfeer-vol" id="sfeerVol" min="0" max="100" step="1" value="80" aria-label="Volume">
+    <span class="sfeer-naam" id="sfeerNaam"></span>
+    <button class="btn icon glass" id="sfeerVolgende" aria-label="Volgende sfeer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <button class="btn icon glass" id="sfeerSluit" aria-label="Sluiten">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- laadpauze: wat is er te doen rond de lader -->
+<div class="sheet" id="lpSheet" hidden>
+  <div class="sheet-card glass" role="dialog" aria-label="Laadpauze">
+    <div class="sheet-head">
+      <div>
+        <div class="lp-title" id="lpTitel">Laadpauze</div>
+        <div class="sheet-sub" id="lpSub"></div>
+      </div>
+      <button class="btn icon glass" id="lpClose" aria-label="Sluiten">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="lp-chips" id="lpChips"></div>
+    <div class="lp-lijst" id="lpLijst"></div>
+    <div class="lp-msg" id="lpMsg"></div>
+    <div class="lp-bron">© OpenStreetMap · Photon</div>
+  </div>
+</div>
+
+<!-- stuur naar auto: koppelcode + QR -->
+<div class="sheet" id="stSheet" hidden>
+  <div class="sheet-card glass" role="dialog" aria-label="Stuur naar auto">
+    <div class="sheet-head">
+      <div class="st-title" id="stTitel">Stuur naar auto</div>
+      <button class="btn icon glass" id="stClose" aria-label="Sluiten">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="st-body">
+      <div class="st-qr" id="stQr"></div>
+      <div class="st-info">
+        <div class="st-uitleg" id="stUitleg"></div>
+        <div class="st-code" id="stCode">······</div>
+        <div class="st-status" id="stStatus"><i></i><span></span></div>
+      </div>
+    </div>
+    <div class="st-lijst" id="stLijst"></div>
+  </div>
+</div>
+
+<div class="st-toast glass" id="stToast" hidden role="status">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+  <div class="wat"><div class="k" id="stToastK">Ontvangen</div><div class="t" id="stToastT"></div></div>
+  <button class="st-open" id="stToastOpen">Openen</button>
+  <button class="st-x" id="stToastX" aria-label="Sluiten">&times;</button>
+</div>
 <div class="dock">
   <button class="btn icon glass" id="resetBtn" title="Standaard herstellen" aria-label="Standaard herstellen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1006,6 +1243,17 @@
       <circle cx="13.5" cy="6.5" r="1.6"/><circle cx="17.5" cy="10.5" r="1.6"/><circle cx="8.5" cy="7.5" r="1.6"/><circle cx="6.5" cy="12.5" r="1.6"/>
       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2H17c2.8 0 5-2.2 5-5 0-4.4-4.5-8-10-8Z"/>
     </svg>
+  </button>
+  <button class="btn icon glass" id="lpBtn" title="Laadpauze" aria-label="Laadpauze">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/>
+    </svg>
+  </button>
+  <button class="btn icon glass" id="stBtn" title="Stuur naar auto" aria-label="Stuur naar auto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="4" width="9" height="16" rx="2"/><path d="M14 12h8M18.5 8.5 22 12l-3.5 3.5"/>
+    </svg>
+    <span class="dot"></span>
   </button>
   <button class="btn icon glass" id="ambBtn" title="Sluimerstand" aria-label="Sluimerstand">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1158,6 +1406,14 @@
     wx_buien: { nl: 'buien', en: 'showers' },
     wx_sneeuwbuien: { nl: 'sneeuwbuien', en: 'snow showers' },
     wx_onweer: { nl: 'onweer', en: 'thunderstorm' },
+    sfeermodus: { nl: 'Sfeermodus', en: 'Ambience' },
+    sfeer_vuur: { nl: 'Haardvuur', en: 'Fireplace' },
+    sfeer_regen: { nl: 'Regen', en: 'Rain' },
+    sfeer_sterren: { nl: 'Sterrenhemel', en: 'Starry sky' },
+    sfeer_lofi: { nl: 'Lofi', en: 'Lo-fi' },
+    geluid_aan: { nl: 'Geluid aan', en: 'Sound on' },
+    geluid_uit: { nl: 'Geluid uit', en: 'Sound off' },
+    volume: { nl: 'Volume', en: 'Volume' },
   };
   function tr(k) { var e = I18N[k]; if (!e) return k; return e[taal] || e.nl || k; }
   var DAGEN_KORT = taal === 'en'
@@ -1868,6 +2124,7 @@
   }
 
   function ambOn() {
+    if (document.body.classList.contains('sfeer')) return;   // sfeermodus gaat voor
     var amb = document.getElementById('ambient');
     if (!amb.hidden) return;
     ambTick();
@@ -1975,14 +2232,40 @@
   rbClockEl.addEventListener('click', function (ev) {
     if (rbActief) { ev.stopPropagation(); rbActief = false; }
   });
-  var rbTimer1 = null, rbTimer2 = null;
+  var rbTimer1 = null, rbTimer2 = null, rbLaag = null;
+  var RB_ID = '5efBucVUGVA';   // "Rainbow Screen Change" (YouTube)
+  function rbYt(func, args) {
+    var f = rbLaag && rbLaag.firstChild;
+    if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: args || [] }), '*');
+  }
   function startRainbow() {
     clearTimeout(rbTimer1); clearTimeout(rbTimer2);
     document.body.classList.remove('rainbow-out');
     document.body.classList.add('rainbow');
+    if (!rbLaag && navigator.onLine !== false) {
+      rbLaag = document.createElement('div');
+      rbLaag.className = 'rb-laag';
+      var f = document.createElement('iframe');
+      f.setAttribute('allow', 'autoplay; encrypted-media');
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      f.setAttribute('tabindex', '-1'); f.setAttribute('aria-hidden', 'true');
+      f.src = 'https://www.youtube.com/embed/' + RB_ID + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + RB_ID +
+        '&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&vq=hd2160&enablejsapi=1&origin=' +
+        encodeURIComponent(location.origin);
+      f.addEventListener('load', function () {
+        [300, 1000, 2000].forEach(function (ms) {
+          setTimeout(function () { rbYt('playVideo'); rbYt('setPlaybackRate', [2]); rbYt('unloadModule', ['captions']); rbYt('setPlaybackQuality', ['highres']); }, ms);
+        });
+        // pas als de video er is de CSS-kleurwissel weghalen, anders even niets te zien
+        setTimeout(function () { if (rbLaag) document.body.classList.add('rb-video'); }, 1200);
+      });
+      rbLaag.appendChild(f);
+      document.body.appendChild(rbLaag);
+    }
     rbTimer1 = setTimeout(function () { document.body.classList.add('rainbow-out'); }, 9400);
     rbTimer2 = setTimeout(function () {
-      document.body.classList.remove('rainbow', 'rainbow-out');
+      document.body.classList.remove('rainbow', 'rainbow-out', 'rb-video');
+      if (rbLaag) { rbLaag.remove(); rbLaag = null; }
     }, 10000);
   }
 
@@ -3202,6 +3485,767 @@
       grid.innerHTML = '<div class="err"><strong>services.json kon niet geladen worden</strong><br>' +
         e.message + '<br>Controleer /var/www/theater/services.json op de container.</div>';
     });
+
+  /* ---- sfeermodus: haardvuur, regen, sterrenhemel, lofi ----
+     Beeld op een canvas (max ~30 fps, devicePixelRatio 1: de autobrowser is
+     geen gameconsole), geluid volledig gegenereerd met WebAudio — geen
+     externe audiobestanden, dus ook geen licentiegedoe. */
+  (function sfeermodus() {
+    var SKEY = 'wattsplaying.sfeer';
+    var st = {};
+    try { st = JSON.parse(localStorage.getItem(SKEY)) || {}; } catch (e) {}
+    function bewaar() { try { localStorage.setItem(SKEY, JSON.stringify(st)); } catch (e) {} }
+
+    var wrap = document.getElementById('sfeerWrap');
+    var knop = document.getElementById('sfeerBtn');
+    var menu = document.getElementById('sfeerMenu');
+    var laag = document.getElementById('sfeer');
+    var cv = document.getElementById('sfeerCanvas');
+    var cx = cv.getContext('2d');
+    var muteBtn = document.getElementById('sfeerMute');
+    var naamEl = document.getElementById('sfeerNaam');
+    var volEl = document.getElementById('sfeerVol');
+    if (typeof st.vol !== 'number') st.vol = 80;
+    var klokEl = document.getElementById('sfeerKlok');
+    if (!wrap || !laag) return;
+
+    var W = 0, H = 0, huidig = null, raf = null, vorige = 0, klokTimer = null, rustTimer = null;
+    var actx = null, master = null, geluid = null, videoEl = null;
+    function videoWeg() { if (videoEl) { videoEl.remove(); videoEl = null; } }
+    function videoAan(id) {
+      // YouTube zonder knoppen/titel, gedempt (geluid komt van ons), in een lus; iets ingezoomd
+      // zodat randen met YouTube-logo/titel buiten beeld vallen. Klikken gaan er dwars doorheen.
+      videoEl = document.createElement('iframe');
+      videoEl.className = 'sfeer-video';
+      videoEl.setAttribute('allow', 'autoplay; encrypted-media');
+      videoEl.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      videoEl.setAttribute('tabindex', '-1');
+      videoEl.setAttribute('aria-hidden', 'true');
+      // gedempt starten speelt altijd automatisch af; daarna geluid aan via de iframe-API.
+      // Dat mag omdat de gebruiker net op "Haardvuur" tikte.
+      videoEl.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + id +
+        '&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&vq=hd2160&enablejsapi=1&origin=' +
+        encodeURIComponent(location.origin);
+      videoEl.addEventListener('load', function () {
+        [300, 1200, 3000].forEach(function (ms) {
+          setTimeout(function () {
+            yt('playVideo'); yt('unloadModule', ['captions']); yt('unloadModule', ['cc']);   // ondertiteling hard uit
+            yt('setPlaybackQuality', ['highres']);   // verzoek om hoogste kwaliteit; YouTube mag het negeren
+            if (!st.stil) { yt('unMute'); yt('setVolume', [st.vol]); }
+          }, ms);
+        });
+      });
+      laag.insertBefore(videoEl, cv.nextSibling);
+    }
+    function yt(func, args) {
+      if (videoEl && videoEl.contentWindow) videoEl.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: args || [] }), '*');
+    }
+
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; }
+    function sprite(r, g, b) {
+      var c = document.createElement('canvas'); c.width = c.height = 64;
+      var x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',1)');
+      gr.addColorStop(0.4, 'rgba(' + r + ',' + g + ',' + b + ',.45)');
+      gr.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+      x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+      return c;
+    }
+    function lineair(stops) {
+      var g = cx.createLinearGradient(0, 0, 0, H);
+      stops.forEach(function (s) { g.addColorStop(s[0], s[1]); });
+      return g;
+    }
+
+    /* --- geluid: bouwstenen --- */
+    function ruis(sec, bruin) {
+      var n = Math.floor(actx.sampleRate * sec), buf = actx.createBuffer(1, n, actx.sampleRate);
+      var d = buf.getChannelData(0), last = 0;
+      for (var i = 0; i < n; i++) {
+        var w = Math.random() * 2 - 1;
+        if (bruin) { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
+      }
+      return buf;
+    }
+    function lus(buf, naar) {
+      var s = actx.createBufferSource(); s.buffer = buf; s.loop = true;
+      s.loopStart = Math.random() * buf.duration * 0.5; s.connect(naar); s.start();
+      return s;
+    }
+    function filter(type, freq, q) {
+      var f = actx.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+      if (q) f.Q.value = q; return f;
+    }
+    function versterk(v) { var g = actx.createGain(); g.gain.value = v; return g; }
+    function keten() { for (var i = 0; i < arguments.length - 1; i++) arguments[i].connect(arguments[i + 1]); return arguments[0]; }
+    function plof(buf, t, dur, type, freq, vol, naar) {
+      var s = actx.createBufferSource(); s.buffer = buf;
+      var f = filter(type, freq, 0.9), g = actx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      keten(s, f, g, naar); s.start(t, Math.random() * (buf.duration - dur - 0.05)); s.stop(t + dur + 0.02);
+    }
+    function toon(freq, t, dur, vol, naar, type) {
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      keten(o, g, naar); o.start(t); o.stop(t + dur + 0.05);
+      return o;
+    }
+
+    var SCENES = [
+      { id: 'vuur', label: 'sfeer_vuur', kleur: 'linear-gradient(135deg,#ff9a3c,#e8452c)',
+        video: 'CIj-ZDSjZ2E',   // "Cozy Fireplace 4K (12 hours)" op YouTube, mét knettergeluid; getekend vuur alleen zonder internet
+        icoon: '<path d="M12 2c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.6 1.2 2.6 2.2 3C10.5 7.8 11 4.6 12 2Z"/>',
+        init: function () {
+          this.deeltjes = []; this.vonken = [];
+          this.sp = [sprite(255, 214, 120), sprite(255, 150, 50), sprite(240, 86, 30)];
+        },
+        teken: function (dt, t) {
+          var fl = 0.78 + 0.12 * Math.sin(t * 7.3) + 0.1 * Math.sin(t * 13.1 + 1);
+          cx.fillStyle = lineair([[0, '#06030a'], [1, '#1c0b05']]); cx.fillRect(0, 0, W, H);
+          var gl = cx.createRadialGradient(W / 2, H * 0.8, 0, W / 2, H * 0.8, Math.max(W, H) * 0.6 * fl);
+          gl.addColorStop(0, 'rgba(255,120,30,' + (0.32 * fl) + ')'); gl.addColorStop(1, 'rgba(255,90,20,0)');
+          cx.fillStyle = gl; cx.fillRect(0, 0, W, H);
+          // kolenbed + houtblokken (dikke lijnen met ronde kopjes)
+          var kb = cx.createRadialGradient(W / 2, H * 0.86, 0, W / 2, H * 0.86, W * 0.2);
+          kb.addColorStop(0, 'rgba(255,110,30,' + (0.55 * fl) + ')'); kb.addColorStop(1, 'rgba(255,80,20,0)');
+          cx.fillStyle = kb; cx.beginPath(); cx.ellipse(W / 2, H * 0.87, W * 0.2, H * 0.06, 0, 0, 6.283); cx.fill();
+          cx.lineCap = 'round'; cx.lineWidth = H * 0.055;
+          [[-0.15, 0.82, 0.13, 0.89, '#24120a'], [0.15, 0.82, -0.13, 0.89, '#2c170c'], [-0.17, 0.9, 0.17, 0.9, '#1c0e07']].forEach(function (b) {
+            cx.strokeStyle = b[4]; cx.beginPath(); cx.moveTo(W / 2 + b[0] * W, H * b[1]); cx.lineTo(W / 2 + b[2] * W, H * b[3]); cx.stroke();
+          });
+          cx.lineCap = 'butt';
+          var s = H / 800, i, p;
+          for (i = Math.round(dt * 105); i > 0; i--) {
+            this.deeltjes.push({ x: W / 2 + gauss() * W * 0.09, y: H * 0.84, vx: gauss() * 26 * s,
+              vy: -rnd(140, 280) * s, l: 0, m: rnd(0.8, 1.8), g: rnd(55, 115) * s });
+          }
+          if (Math.random() < dt * 7) this.vonken.push({ x: W / 2 + gauss() * W * 0.06, y: H * 0.8,
+            vx: gauss() * 40 * s, vy: -rnd(80, 220) * s, l: 0, m: rnd(1.5, 3.5) });
+          cx.globalCompositeOperation = 'lighter';
+          for (i = this.deeltjes.length - 1; i >= 0; i--) {
+            p = this.deeltjes[i]; p.l += dt;
+            if (p.l > p.m) { this.deeltjes.splice(i, 1); continue; }
+            var k = p.l / p.m, g = p.g * (1 - k * 0.65);
+            p.vx += (W / 2 - p.x) * 1.3 * dt;    // vlammen lopen naar boven toe taps toe
+            p.x += (p.vx + Math.sin(t * 3 + p.y * 0.02) * 16 * s) * dt; p.y += p.vy * dt;
+            cx.globalAlpha = Math.pow(1 - k, 0.6) * 0.4;
+            cx.drawImage(this.sp[k < 0.2 ? 0 : k < 0.6 ? 1 : 2], p.x - g / 2, p.y - g, g, g * 1.8);   // langgerekt: vlamtongen
+          }
+          cx.globalAlpha = 1;
+          for (i = this.vonken.length - 1; i >= 0; i--) {
+            p = this.vonken[i]; p.l += dt;
+            if (p.l > p.m) { this.vonken.splice(i, 1); continue; }
+            p.x += (p.vx + Math.sin(t * 2 + i) * 20 * s) * dt; p.y += p.vy * dt;
+            cx.fillStyle = 'rgba(255,200,110,' + (1 - p.l / p.m) + ')'; cx.fillRect(p.x, p.y, 2, 2);
+          }
+          cx.globalCompositeOperation = 'source-over';
+        },
+        geluid: function (uit) {
+          var iv = synthetisch();
+          return { stop: function () { clearInterval(iv); } };
+          function synthetisch() {
+          var bruin = ruis(4, true), wit = ruis(2, false);
+          var vf = filter('lowpass', 520); keten(vf, versterk(0.55), uit); lus(bruin, vf);
+          return setInterval(function () {
+            var t = actx.currentTime;
+            if (Math.random() < 0.45) plof(wit, t + Math.random() * 0.04, rnd(0.004, 0.03), 'bandpass', rnd(900, 3800), rnd(0.08, 0.4), uit);
+            if (Math.random() < 0.03) plof(wit, t, rnd(0.03, 0.07), 'bandpass', rnd(500, 1200), rnd(0.4, 0.7), uit);
+          }, 45);
+          }
+        }
+      },
+      { id: 'regen', label: 'sfeer_regen', kleur: 'linear-gradient(135deg,#5ea4ff,#2d5bd1)',
+        video: 'eTeD8DAta4c',   // "Ontspannende regengeluiden"
+        icoon: '<path d="M20 15.5A4.5 4.5 0 0 0 16 9h-1.3A7 7 0 1 0 4 15"/><path d="M8 19v2M8 13v2M16 19v2M16 13v2M12 21v2M12 15v2"/>',
+        init: function () {
+          var n = Math.round(W * H / 4500), i;
+          this.druppels = []; this.spat = []; this.ruit = []; this.flits = 0; this.volgendeFlits = rnd(18, 35);
+          for (i = 0; i < n; i++) this.druppels.push({ x: rnd(-100, W + 100), y: rnd(-H, H), l: rnd(12, 28), v: rnd(700, 1100) });
+          for (i = 0; i < 38; i++) this.ruit.push({ x: rnd(0, W), y: rnd(0, H), r: rnd(2, 7), v: 0 });
+          this.bokeh = []; this.sp = [sprite(255, 190, 110), sprite(140, 180, 255)];
+          for (i = 0; i < 16; i++) this.bokeh.push({ x: rnd(0, W), y: rnd(H * 0.35, H), g: rnd(40, 120), c: i % 3 ? 0 : 1, f: rnd(0, 6) });
+        },
+        teken: function (dt, t) {
+          var s = H / 800, i, d;
+          cx.fillStyle = lineair([[0, '#080d16'], [1, '#18222f']]); cx.fillRect(0, 0, W, H);
+          cx.globalCompositeOperation = 'lighter';
+          for (i = 0; i < this.bokeh.length; i++) {
+            d = this.bokeh[i]; cx.globalAlpha = 0.12 + 0.05 * Math.sin(t * 0.5 + d.f);
+            cx.drawImage(this.sp[d.c], d.x - d.g / 2, d.y - d.g / 2, d.g, d.g);
+          }
+          cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over';
+          cx.strokeStyle = 'rgba(170,195,235,.33)'; cx.lineWidth = 1.2; cx.beginPath();
+          for (i = 0; i < this.druppels.length; i++) {
+            d = this.druppels[i]; d.x += d.v * 0.16 * dt * s; d.y += d.v * dt * s;
+            if (d.y > H) {
+              if (Math.random() < 0.3) this.spat.push({ x: d.x, y: H - rnd(0, H * 0.06), l: 0 });
+              d.y = -d.l - rnd(0, 200); d.x = rnd(-100, W);
+            }
+            cx.moveTo(d.x, d.y); cx.lineTo(d.x - d.l * 0.16 * s, d.y - d.l * s);
+          }
+          cx.stroke();
+          cx.strokeStyle = 'rgba(170,195,235,.35)'; cx.lineWidth = 1;
+          for (i = this.spat.length - 1; i >= 0; i--) {
+            d = this.spat[i]; d.l += dt;
+            if (d.l > 0.28) { this.spat.splice(i, 1); continue; }
+            cx.globalAlpha = 1 - d.l / 0.28; cx.beginPath(); cx.ellipse(d.x, d.y, 2 + d.l * 26, 1 + d.l * 6, 0, Math.PI, 0); cx.stroke();
+          }
+          cx.globalAlpha = 1;
+          for (i = 0; i < this.ruit.length; i++) {
+            d = this.ruit[i];
+            if (d.v === 0 && Math.random() < dt * 0.06) d.v = rnd(40, 140);
+            if (d.v > 0) { d.y += d.v * dt; d.v -= dt * 30; if (d.v < 0) d.v = 0; }
+            if (d.y > H + 10) { d.y = -10; d.x = rnd(0, W); }
+            cx.fillStyle = 'rgba(190,215,255,.10)'; cx.beginPath(); cx.arc(d.x, d.y, d.r, 0, 6.283); cx.fill();
+            cx.fillStyle = 'rgba(255,255,255,.28)'; cx.fillRect(d.x - d.r * 0.35, d.y - d.r * 0.45, 1.4, 1.4);
+          }
+          if (t > this.volgendeFlits) {
+            this.flits = 1; this.volgendeFlits = t + rnd(22, 45);
+            if (geluid && geluid.donder) geluid.donder();
+          }
+          if (this.flits > 0) {
+            cx.fillStyle = 'rgba(210,225,255,' + (this.flits * 0.3 * (Math.random() < 0.8 ? 1 : 0.4)) + ')';
+            cx.fillRect(0, 0, W, H); this.flits -= dt * 2.2;
+          }
+        },
+        geluid: function (uit) {
+          var wit = ruis(3, false), bruin = ruis(4, true);
+          var hp = filter('highpass', 450), lp = filter('lowpass', 1100);
+          keten(hp, filter('lowpass', 7000), versterk(0.16), uit); lus(wit, hp);
+          keten(lp, versterk(0.35), uit); lus(bruin, lp);
+          var iv = setInterval(function () {
+            if (Math.random() < 0.25) toon(rnd(1300, 2600), actx.currentTime, 0.06, rnd(0.008, 0.02), uit);
+          }, 120);
+          return {
+            stop: function () { clearInterval(iv); },
+            donder: function () {
+              var t = actx.currentTime + rnd(0.6, 1.6), s = actx.createBufferSource(); s.buffer = bruin;
+              var g = actx.createGain();
+              g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.9, t + 0.35);
+              g.gain.exponentialRampToValueAtTime(0.0001, t + 4.5);
+              keten(s, filter('lowpass', 160), g, uit); s.start(t); s.stop(t + 4.6);
+            }
+          };
+        }
+      },
+      { id: 'sterren', label: 'sfeer_sterren', kleur: 'linear-gradient(135deg,#7b6cff,#2b2a7a)',
+        video: 'pbDXHlAuAys',   // "10 Hours of Starfield" (met ambient muziek)
+        icoon: '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7Z"/>',
+        init: function () {
+          var i; this.sterren = []; this.vallend = null; this.volgende = rnd(4, 9);
+          for (i = 0; i < Math.round(W * H / 2600); i++) this.sterren.push({ x: rnd(0, W), y: rnd(0, H * 0.85),
+            g: Math.random() < 0.08 ? rnd(1.8, 2.6) : rnd(0.7, 1.6), f: rnd(0, 6.283), v: rnd(0.6, 2.2),
+            k: Math.random() < 0.15 ? (Math.random() < 0.5 ? '200,215,255' : '255,230,200') : '255,255,255' });
+          // melkweg: zachte diagonale band met heel veel kleine stipjes, één keer vooraf
+          this.nevel = document.createElement('canvas'); this.nevel.width = W; this.nevel.height = H;
+          var nv = this.nevel.getContext('2d');
+          for (i = 0; i < 14; i++) {
+            var bx = W * (0.1 + i * 0.065), by = H * (0.75 - i * 0.05), br = H * rnd(0.12, 0.22);
+            var ng = nv.createRadialGradient(bx, by, 0, bx, by, br);
+            ng.addColorStop(0, 'rgba(150,140,220,.07)'); ng.addColorStop(1, 'rgba(150,140,220,0)');
+            nv.fillStyle = ng; nv.fillRect(bx - br, by - br, br * 2, br * 2);
+          }
+          for (i = 0; i < 1400; i++) {
+            var u = Math.random(), off = gauss() * H * 0.1;
+            nv.fillStyle = 'rgba(230,230,255,' + rnd(0.08, 0.35) + ')';
+            nv.fillRect(W * (0.05 + u * 0.95) + off * 0.5, H * (0.8 - u * 0.75) + off, 1, 1);
+          }
+          // heuvels één keer vooraf tekenen
+          this.heuvel = document.createElement('canvas'); this.heuvel.width = W; this.heuvel.height = H;
+          var h = this.heuvel.getContext('2d');
+          [['#070b18', 0.80, 0.05], ['#03050c', 0.88, 0.04]].forEach(function (laag, n) {
+            h.fillStyle = laag[0]; h.beginPath(); h.moveTo(0, H);
+            for (var x = 0; x <= W; x += 20) h.lineTo(x, H * laag[1] - Math.sin(x / W * (5 + n * 3) + n) * H * laag[2] - Math.sin(x / W * 17) * H * 0.008);
+            h.lineTo(W, H); h.fill();
+          });
+        },
+        teken: function (dt, t) {
+          var i, s;
+          cx.fillStyle = lineair([[0, '#02030a'], [0.7, '#0a1230'], [1, '#18204a']]); cx.fillRect(0, 0, W, H);
+          cx.drawImage(this.nevel, 0, 0);
+          for (i = 0; i < this.sterren.length; i++) {
+            s = this.sterren[i];
+            s.x += dt * 1.2 * s.g; if (s.x > W) s.x -= W;     // heel langzaam meedrijven
+            var x = s.x, y = s.y;
+            cx.fillStyle = 'rgba(' + s.k + ',' + (0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.v + s.f))) + ')';
+            cx.fillRect(x, y, s.g, s.g);
+          }
+          if (!this.vallend && t > this.volgende) {
+            this.vallend = { x: rnd(W * 0.1, W * 0.8), y: rnd(0, H * 0.35), vx: rnd(500, 800), vy: rnd(180, 320), l: 0 };
+            this.volgende = t + rnd(6, 14);
+            if (geluid && geluid.ting) geluid.ting();
+          }
+          if (this.vallend) {
+            var v = this.vallend; v.l += dt; v.x += v.vx * dt; v.y += v.vy * dt;
+            var g = cx.createLinearGradient(v.x, v.y, v.x - v.vx * 0.18, v.y - v.vy * 0.18);
+            g.addColorStop(0, 'rgba(255,255,255,' + Math.max(0, 1 - v.l / 0.9) + ')'); g.addColorStop(1, 'rgba(255,255,255,0)');
+            cx.strokeStyle = g; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(v.x, v.y);
+            cx.lineTo(v.x - v.vx * 0.18, v.y - v.vy * 0.18); cx.stroke();
+            if (v.l > 0.9) this.vallend = null;
+          }
+          cx.drawImage(this.heuvel, 0, 0);
+        },
+        geluid: function (uit) {
+          var pad = keten(versterk(1), filter('lowpass', 1100), versterk(0.9), uit);
+          var lfo = actx.createOscillator(), diep = versterk(0.4);
+          lfo.frequency.value = 0.05; keten(lfo, diep, pad.gain); lfo.start();
+          var oscs = [110, 164.81, 220, 277.18, 329.63].map(function (f) {
+            var o = actx.createOscillator(), g = versterk(0.03);
+            o.frequency.value = f; o.detune.value = rnd(-6, 6); keten(o, g, pad); o.start(); return o;
+          });
+          var wind = filter('lowpass', 380), wl = actx.createOscillator(), wd = versterk(180);
+          keten(wind, versterk(0.08), uit); lus(ruis(4, true), wind);
+          wl.frequency.value = 0.08; keten(wl, wd, wind.frequency); wl.start();
+          var PENTA = [880, 987.77, 1108.73, 1318.51, 1479.98, 1760];
+          return {
+            stop: function () { oscs.forEach(function (o) { o.stop(); }); lfo.stop(); wl.stop(); },
+            ting: function () { toon(PENTA[Math.floor(Math.random() * PENTA.length)], actx.currentTime, 3, 0.035, uit); }
+          };
+        }
+      },
+      { id: 'lofi', label: 'sfeer_lofi', kleur: 'linear-gradient(135deg,#ff7eb3,#a855f7)',
+        video: 'Tbw3w0RA0WU',   // "Lo-fi Neon Skyline"
+        icoon: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+        init: function () {
+          var i, x = 0;
+          this.stad = document.createElement('canvas'); this.stad.width = W; this.stad.height = H;
+          var c = this.stad.getContext('2d');
+          c.fillStyle = '#1b0f26';
+          while (x < W) {
+            var bw = rnd(W * 0.04, W * 0.09), bh = rnd(H * 0.12, H * 0.38);
+            c.fillRect(x, H * 0.82 - bh, bw, bh + H * 0.2);
+            for (var wy = H * 0.82 - bh + 10; wy < H * 0.8; wy += 14)
+              for (var wx = x + 6; wx < x + bw - 6; wx += 11)
+                if (Math.random() < 0.22) { c.fillStyle = 'rgba(255,205,120,' + rnd(0.35, 0.8) + ')'; c.fillRect(wx, wy, 4, 6); c.fillStyle = '#1b0f26'; }
+            x += bw + rnd(2, 10);
+          }
+          this.stof = [];
+          for (i = 0; i < 45; i++) this.stof.push({ x: rnd(0, W), y: rnd(0, H), v: rnd(4, 14), f: rnd(0, 6) });
+        },
+        teken: function (dt, t) {
+          var i, d;
+          cx.fillStyle = lineair([[0, '#1d1236'], [0.45, '#6b2f63'], [0.75, '#e0795f'], [1, '#f6b47f']]); cx.fillRect(0, 0, W, H);
+          var zx = W * 0.66, zy = H * 0.6, zr = H * 0.17, zg = cx.createLinearGradient(0, zy - zr, 0, zy + zr);
+          zg.addColorStop(0, '#ffe2a8'); zg.addColorStop(1, '#ff8a6b');
+          cx.fillStyle = zg; cx.beginPath(); cx.arc(zx, zy, zr, 0, 6.283); cx.fill();
+          cx.drawImage(this.stad, 0, 0);
+          cx.fillStyle = 'rgba(255,230,200,.35)';
+          for (i = 0; i < this.stof.length; i++) {
+            d = this.stof[i]; d.y -= d.v * dt; d.x += Math.sin(t * 0.4 + d.f) * 6 * dt;
+            if (d.y < -5) { d.y = H + 5; d.x = rnd(0, W); }
+            cx.fillRect(d.x, d.y, 1.6, 1.6);
+          }
+          // raamkozijn: je kijkt vanuit een kamer naar buiten
+          var k = Math.max(14, W * 0.022);
+          cx.fillStyle = '#120a19';
+          cx.fillRect(0, 0, W, k); cx.fillRect(0, 0, k, H); cx.fillRect(W - k, 0, k, H);
+          cx.fillRect(W * 0.5 - k / 2, 0, k, H * 0.8); cx.fillRect(0, H * 0.42, W, k * 0.7);
+          cx.fillStyle = '#1e1226'; cx.fillRect(0, H * 0.8, W, H * 0.2);
+          // platenspeler op de vensterbank
+          var px = W * 0.2, py = H * 0.885, pr = Math.min(W, H) * 0.12, a = t * 3.49;
+          cx.fillStyle = '#2b1c33'; cx.beginPath();
+          if (cx.roundRect) cx.roundRect(px - pr * 1.3, py - pr * 0.6, pr * 2.75, pr * 1.2, 10); else cx.rect(px - pr * 1.3, py - pr * 0.6, pr * 2.75, pr * 1.2);
+          cx.fill();
+          cx.strokeStyle = '#8f7f99'; cx.lineWidth = 3; cx.lineCap = 'round';
+          cx.beginPath(); cx.moveTo(px + pr * 1.25, py - pr * 0.45); cx.lineTo(px + pr * 1.05, py + pr * 0.05); cx.lineTo(px + pr * 0.55, py + pr * 0.18); cx.stroke();
+          cx.lineCap = 'butt';
+          cx.save(); cx.translate(px, py); cx.scale(1, 0.42);
+          cx.fillStyle = '#0b0b0f'; cx.beginPath(); cx.arc(0, 0, pr, 0, 6.283); cx.fill();
+          cx.strokeStyle = 'rgba(255,255,255,.07)'; cx.lineWidth = 1;
+          for (i = 0.45; i < 1; i += 0.09) { cx.beginPath(); cx.arc(0, 0, pr * i, 0, 6.283); cx.stroke(); }
+          cx.strokeStyle = 'rgba(255,255,255,.18)'; cx.lineWidth = pr * 0.08;
+          cx.beginPath(); cx.arc(0, 0, pr * 0.72, a, a + 0.5); cx.stroke();
+          cx.fillStyle = '#ff7eb3'; cx.beginPath(); cx.arc(0, 0, pr * 0.3, 0, 6.283); cx.fill();
+          cx.restore();
+        },
+        geluid: function (uit) {
+          var bus = keten(filter('lowpass', 1700), versterk(0.9), uit);
+          var wow = actx.createOscillator(), wowD = versterk(7); wow.frequency.value = 0.45; keten(wow, wowD); wow.start();
+          var wit = ruis(2, false);
+          var sis = filter('lowpass', 5000); keten(sis, versterk(0.012), uit); lus(wit, sis);
+          var AKK = [[146.83, 174.61, 220, 261.63, 329.63], [98, 174.61, 246.94, 329.63], [130.81, 164.81, 196, 246.94, 293.66], [110, 196, 261.63, 329.63]];
+          var stap = 60 / 72 / 4, idx = 0, volgende = actx.currentTime + 0.1;
+          function piano(f, t, dur, v) {
+            var o = toon(f, t, dur, v, bus); wowD.connect(o.detune);
+            var o2 = toon(f * 2, t, dur * 0.5, v * 0.18, bus); wowD.connect(o2.detune);
+          }
+          function kick(t) {
+            var o = actx.createOscillator(), g = actx.createGain();
+            o.frequency.setValueAtTime(115, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.13);
+            g.gain.setValueAtTime(0.85, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+            keten(o, g, uit); o.start(t); o.stop(t + 0.36);
+          }
+          function speel(i, t) {
+            var maat = i >> 4, s = i & 15, akk = AKK[maat];
+            if (s === 0) akk.forEach(function (f, n) { piano(f, t + n * 0.012, 2.6, 0.075); });
+            if (s === 8 && Math.random() < 0.6) piano(akk[1 + Math.floor(Math.random() * (akk.length - 1))] * 2, t, 1.2, 0.05);
+            if ((s === 14 || s === 6) && Math.random() < 0.35) piano(akk[akk.length - 1] * 2, t, 0.9, 0.04);
+            if (s === 0 || s === 10) kick(t);
+            if (s === 4 || s === 12) { plof(wit, t, 0.17, 'bandpass', 1800, 0.22, uit); toon(185, t, 0.08, 0.06, uit, 'triangle'); }
+            if (s % 2 === 0) plof(wit, t, 0.035, 'highpass', 7200, s % 4 ? 0.05 : 0.08, uit);
+          }
+          var iv = setInterval(function () {
+            while (volgende < actx.currentTime + 0.18) {
+              speel(idx, volgende + (idx % 2 ? stap * 0.18 : 0));
+              volgende += stap; idx = (idx + 1) % 64;
+            }
+            if (Math.random() < 0.3) plof(wit, actx.currentTime + 0.05, rnd(0.004, 0.012), 'bandpass', rnd(2500, 6000), rnd(0.02, 0.07), uit);
+          }, 50);
+          return { stop: function () { clearInterval(iv); wow.stop(); } };
+        }
+      }
+    ];
+
+    /* --- menu --- */
+    SCENES.forEach(function (sc) {
+      var b = document.createElement('button');
+      b.className = 'sfeer-opt'; b.type = 'button'; b.setAttribute('role', 'menuitem');
+      b.innerHTML = '<span class="ico" style="--c:' + sc.kleur + '"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + sc.icoon + '</svg></span><span></span>';
+      b.lastChild.textContent = tr(sc.label);
+      b.addEventListener('click', function () { start(sc); });
+      menu.appendChild(b);
+    });
+    knop.title = tr('sfeermodus'); knop.setAttribute('aria-label', tr('sfeermodus'));
+    function menuOpen(open) {
+      wrap.classList.toggle('open', open); knop.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    knop.addEventListener('click', function (e) { e.stopPropagation(); menuOpen(!wrap.classList.contains('open')); });
+    document.addEventListener('pointerdown', function (e) { if (!wrap.contains(e.target)) menuOpen(false); });
+
+    /* --- scène starten/stoppen --- */
+    function maat() {
+      W = cv.width = window.innerWidth; H = cv.height = window.innerHeight;
+      if (huidig) huidig.init();
+    }
+    function klok() {
+      klokEl.textContent = new Date().toLocaleTimeString(taal === 'en' ? 'en-GB' : 'nl-NL', { hour: '2-digit', minute: '2-digit' });
+    }
+    function lus60(ts) {
+      raf = requestAnimationFrame(lus60);
+      if (ts - vorige < 32) return;           // ~30 fps is genoeg en spaart de autocomputer
+      var dt = Math.min(0.1, (ts - vorige) / 1000); vorige = ts;
+      if (!videoEl) huidig.teken(dt, ts / 1000);   // met video: niets tekenen
+    }
+    function toonBalk() {
+      laag.classList.remove('rust'); clearTimeout(rustTimer);
+      rustTimer = setTimeout(function () { laag.classList.add('rust'); }, 4000);
+    }
+    function geluidAan() {
+      if (geluid) { geluid.stop(); geluid = null; }
+      if (st.stil || videoEl) return;   // video's hebben hun eigen geluid
+      if (!actx) {
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        master = actx.createGain(); master.gain.value = st.vol / 100; master.connect(actx.destination);
+      }
+      if (actx.state === 'suspended') actx.resume();
+      var bus = versterk(0); bus.connect(master);
+      bus.gain.setTargetAtTime(1, actx.currentTime, 0.6);   // zacht infaden
+      geluid = huidig.geluid(bus); geluid.bus = bus;
+    }
+    function geluidUit() {
+      if (!geluid) return;
+      var g = geluid; geluid = null; g.stop();
+      g.bus.gain.setTargetAtTime(0, actx.currentTime, 0.15);
+      setTimeout(function () { g.bus.disconnect(); }, 800);
+    }
+    function start(sc) {
+      menuOpen(false);
+      geluidUit();
+      huidig = sc; st.laatst = sc.id; bewaar();
+      videoWeg();
+      if (sc.video && navigator.onLine !== false) videoAan(sc.video);
+      naamEl.textContent = tr(sc.label);
+      muteBtn.classList.toggle('stil', !!st.stil);
+      muteBtn.setAttribute('aria-label', tr(st.stil ? 'geluid_aan' : 'geluid_uit'));
+      volToon();
+      document.body.classList.add('sfeer');
+      laag.hidden = false;
+      maat(); klok();
+      clearInterval(klokTimer); klokTimer = setInterval(klok, 5000);
+      if (!raf) { vorige = performance.now(); raf = requestAnimationFrame(lus60); }
+      geluidAan();
+      toonBalk();
+    }
+    function stop() {
+      geluidUit();
+      cancelAnimationFrame(raf); raf = null; huidig = null; videoWeg();
+      clearInterval(klokTimer); clearTimeout(rustTimer);
+      laag.hidden = true; document.body.classList.remove('sfeer');
+      resetIdle();
+    }
+    document.getElementById('sfeerSluit').addEventListener('click', function (e) { e.stopPropagation(); stop(); });
+    document.getElementById('sfeerVolgende').addEventListener('click', function (e) {
+      e.stopPropagation(); start(SCENES[(SCENES.indexOf(huidig) + 1) % SCENES.length]);
+    });
+    muteBtn.addEventListener('click', function (e) {
+      e.stopPropagation(); st.stil = !st.stil; bewaar();
+      muteBtn.classList.toggle('stil', st.stil);
+      muteBtn.setAttribute('aria-label', tr(st.stil ? 'geluid_aan' : 'geluid_uit'));
+      if (st.stil) geluidUit(); else geluidAan();
+      if (videoEl) yt(st.stil ? 'mute' : 'unMute');
+      toonBalk();
+    });
+    function volToon() { volEl.value = st.vol; volEl.style.setProperty('--pct', st.vol + '%'); }
+    volEl.setAttribute('aria-label', tr('volume'));
+    volEl.addEventListener('input', function () {
+      st.vol = Number(volEl.value); volToon(); toonBalk();
+      if (st.stil && st.vol > 0) {            // schuiven = geluid weer aan
+        st.stil = false; muteBtn.classList.remove('stil');
+        muteBtn.setAttribute('aria-label', tr('geluid_uit'));
+        if (videoEl) yt('unMute'); else geluidAan();
+      }
+      if (videoEl) yt('setVolume', [st.vol]);
+      if (master) master.gain.setTargetAtTime(st.vol / 100, actx.currentTime, 0.05);
+    });
+    volEl.addEventListener('change', bewaar);
+    laag.addEventListener('pointerdown', toonBalk);
+    window.addEventListener('resize', function () { if (huidig) maat(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && huidig) stop(); });
+    document.addEventListener('visibilitychange', function () {
+      if (!actx) return;
+      if (document.hidden) actx.suspend(); else if (huidig && !st.stil) actx.resume();
+    });
+  })();
+
+
+  /* ---------- laadpauze + stuur naar auto ---------- */
+  Object.assign(I18N, {
+    laadpauze: { nl: 'Laadpauze', en: 'Charging break' },
+    lp_sub: { nl: 'Binnen 5 minuten lopen', en: 'Within a 5-minute walk' },
+    lp_bij: { nl: 'Je staat bij', en: 'You are at' },
+    lp_alles: { nl: 'Alles', en: 'All' },
+    lp_eten: { nl: 'Eten', en: 'Food' },
+    lp_koffie: { nl: 'Koffie', en: 'Coffee' },
+    lp_winkel: { nl: 'Boodschappen', en: 'Groceries' },
+    lp_wc: { nl: 'Toilet', en: 'Toilet' },
+    lp_zoeken: { nl: 'Locatie bepalen…', en: 'Finding your location…' },
+    lp_laden: { nl: 'Zoeken in de buurt…', en: 'Searching nearby…' },
+    lp_geenloc: { nl: 'Locatie niet beschikbaar. Zet locatiedeling aan en open de pagina via https.', en: 'Location unavailable. Allow location access and open the page over https.' },
+    lp_fout: { nl: 'Ophalen mislukt. Probeer het zo nog eens.', en: 'Could not load places. Try again in a moment.' },
+    lp_leeg: { nl: 'Niets gevonden binnen 5 minuten lopen.', en: 'Nothing within a 5-minute walk.' },
+    lp_min: { nl: 'min lopen', en: 'min walk' },
+    restaurant: { nl: 'Restaurant', en: 'Restaurant' },
+    fast_food: { nl: 'Fastfood', en: 'Fast food' },
+    cafe: { nl: 'Café', en: 'Café' },
+    ice_cream: { nl: 'IJs', en: 'Ice cream' },
+    bakery: { nl: 'Bakker', en: 'Bakery' },
+    supermarket: { nl: 'Supermarkt', en: 'Supermarket' },
+    convenience: { nl: 'Buurtwinkel', en: 'Convenience store' },
+    toilets: { nl: 'Toilet', en: 'Toilet' },
+    stuur: { nl: 'Stuur naar auto', en: 'Send to car' },
+    st_uitleg: { nl: 'Scan de QR-code met je telefoon, of ga naar <b>{u}</b> en vul deze code in:', en: 'Scan the QR code with your phone, or go to <b>{u}</b> and enter this code:' },
+    st_wacht: { nl: 'Wacht op je telefoon…', en: 'Waiting for your phone…' },
+    st_fout: { nl: 'Geen verbinding met de server', en: 'No connection to the server' },
+    st_ontvangen: { nl: 'Ontvangen van je telefoon', en: 'Received from your phone' },
+    openen: { nl: 'Openen', en: 'Open' },
+  });
+
+  // Gedeeld: een lijstregel met icoon, naam, onderregel en rechts een waarde.
+  function rij(href, kleur, icoon, naam, sub, rechtsB, rechtsS) {
+    var a = document.createElement(href ? 'a' : 'div');
+    a.className = 'lp-item';
+    if (href) a.href = href;
+    a.innerHTML = '<span class="lp-ico" style="--c:' + kleur + '">' + icoon + '</span>' +
+      '<span class="lp-wat"><div class="lp-naam"></div><div class="lp-soort"></div></span>' +
+      '<span class="lp-afst"><b></b><span></span></span>';
+    a.querySelector('.lp-naam').textContent = naam;
+    a.querySelector('.lp-soort').textContent = sub;
+    a.querySelector('.lp-afst b').textContent = rechtsB || '';
+    a.querySelector('.lp-afst span').textContent = rechtsS || '';
+    return a;
+  }
+
+  (function initLaadpauze() {
+    var sheet = document.getElementById('lpSheet');
+    var lijst = document.getElementById('lpLijst'), msg = document.getElementById('lpMsg');
+    var sub = document.getElementById('lpSub'), chips = document.getElementById('lpChips');
+    var svg = function (d) { return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; };
+    // Photon (komoot) i.p.v. Overpass: CORS *, snel, en bij testen gaven de
+    // Overpass-servers om de beurt 406/500/504. Nadeel: geen openingstijden.
+    var CATS = [
+      { id: 'eten', kleur: '#e8714a', tags: ['amenity:restaurant', 'amenity:fast_food'],
+        ico: svg('<path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 21V3c-2 1.5-3 4-3 7v3h3"/>') },
+      { id: 'koffie', kleur: '#a8754e', tags: ['amenity:cafe', 'amenity:ice_cream', 'shop:bakery'],
+        ico: svg('<path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>') },
+      { id: 'winkel', kleur: '#3fa66b', tags: ['shop:supermarket', 'shop:convenience'],
+        ico: svg('<path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>') },
+      { id: 'wc', kleur: '#4f8de0', tags: ['amenity:toilets'],
+        ico: svg('<circle cx="7" cy="4.5" r="1.5"/><circle cx="17" cy="4.5" r="1.5"/><path d="M5 22v-7H4l1-7h4l1 7H9v7M15 22v-6h-2l2-8h4l2 8h-2v6"/>') },
+    ];
+    var STRAAL_KM = 0.4, LOOP_M_MIN = 80;   // ±5 min lopen
+    var plekken = [], filter = 'alles';
+
+    function afstand(a, b, c, d) {   // haversine, meters
+      var r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2);
+      return 12742000 * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y));
+    }
+    function photon(lat, lon, tags, km, n) {
+      var q = 'https://photon.komoot.io/reverse?lat=' + lat + '&lon=' + lon + '&radius=' + km +
+        '&limit=' + n + '&lang=' + (taal === 'en' ? 'en' : 'default') +
+        tags.map(function (t) { return '&osm_tag=' + t; }).join('');
+      return fetch(q).then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+        .then(function (j) { return j.features || []; });
+    }
+    function toon() {
+      chips.innerHTML = '';
+      [{ id: 'alles' }].concat(CATS).forEach(function (c) {
+        var n = c.id === 'alles' ? plekken.length : plekken.filter(function (p) { return p.cat === c; }).length;
+        if (c.id !== 'alles' && !n) return;
+        var b = document.createElement('button');
+        b.className = 'lp-chip' + (filter === c.id ? ' on' : '');
+        b.innerHTML = '<span></span><span class="n">' + n + '</span>';
+        b.firstChild.textContent = tr('lp_' + c.id);
+        b.addEventListener('click', function () { filter = c.id; toon(); });
+        chips.appendChild(b);
+      });
+      lijst.innerHTML = '';
+      plekken.filter(function (p) { return filter === 'alles' || p.cat.id === filter; })
+        .forEach(function (p) {
+          var route = 'https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=' + p.lat + ',' + p.lon;
+          lijst.appendChild(rij(linkFor(route), p.cat.kleur, p.cat.ico, p.naam, tr(p.soort),
+            Math.round(p.m / 10) * 10 + ' m', Math.max(1, Math.round(p.m / LOOP_M_MIN)) + ' ' + tr('lp_min')));
+        });
+    }
+    function zoek(lat, lon) {
+      msg.textContent = tr('lp_laden');
+      var lader = photon(lat, lon, ['amenity:charging_station'], 0.15, 1).catch(function () { return []; });
+      Promise.all(CATS.map(function (c) {
+        return photon(lat, lon, c.tags, STRAAL_KM, 8).then(function (fs) {
+          return fs.map(function (f) {
+            var p = f.properties, g = f.geometry.coordinates;
+            return { cat: c, naam: p.name || tr(p.osm_value), soort: p.osm_value,
+                     lat: g[1], lon: g[0], m: afstand(lat, lon, g[1], g[0]), id: p.osm_type + p.osm_id };
+          });
+        });
+      })).then(function (lijsten) {
+        var gezien = {};
+        plekken = [].concat.apply([], lijsten).filter(function (p) {
+          if (gezien[p.id]) return false;          // bakker-café komt soms dubbel
+          gezien[p.id] = 1;
+          return p.m <= STRAAL_KM * 1000 * 1.25;
+        }).sort(function (a, b) { return a.m - b.m; });
+        msg.textContent = plekken.length ? '' : tr('lp_leeg');
+        toon();
+        return lader;
+      }).then(function (l) {
+        if (l && l[0] && l[0].properties.name) sub.textContent = tr('lp_bij') + ' ' + l[0].properties.name;
+      }).catch(function () { msg.textContent = tr('lp_fout'); });
+    }
+    function open() {
+      sheet.hidden = false;
+      filter = 'alles'; plekken = []; toon();
+      sub.textContent = tr('lp_sub');
+      if (!navigator.geolocation || !window.isSecureContext) { msg.textContent = tr('lp_geenloc'); return; }
+      msg.textContent = tr('lp_zoeken');
+      navigator.geolocation.getCurrentPosition(
+        function (p) { zoek(p.coords.latitude, p.coords.longitude); },
+        function () { msg.textContent = tr('lp_geenloc'); },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+    }
+    document.getElementById('lpTitel').textContent = tr('laadpauze');
+    document.getElementById('lpBtn').title = tr('laadpauze');
+    document.getElementById('lpBtn').setAttribute('aria-label', tr('laadpauze'));
+    document.getElementById('lpBtn').addEventListener('click', open);
+    document.getElementById('lpClose').addEventListener('click', function () { sheet.hidden = true; });
+    sheet.addEventListener('click', function (ev) { if (ev.target === sheet) sheet.hidden = true; });
+  })();
+
+  (function initStuur() {
+    var API = '/api/stuur/';
+    var TELEFOON = '/stuur/';
+    var sheet = document.getElementById('stSheet'), btn = document.getElementById('stBtn');
+    var status = document.getElementById('stStatus'), lijst = document.getElementById('stLijst');
+    var toast = document.getElementById('stToast');
+    var code = null, timer = null, laatsteActie = 0, laatste = null, qrLib = null;
+    var STOP_NA = 30 * 60e3;    // na een half uur zonder sheet of ontvangst stoppen met pollen
+
+    function zetStatus(fout) {
+      status.classList.toggle('fout', !!fout);
+      status.lastChild.textContent = tr(fout ? 'st_fout' : 'st_wacht');
+    }
+    function laadQr() {
+      if (qrLib) return qrLib;
+      qrLib = new Promise(function (ok, nee) {
+        var s = document.createElement('script');
+        s.src = '/qrcode.min.js'; s.onload = ok; s.onerror = nee;
+        document.head.appendChild(s);
+      });
+      return qrLib;
+    }
+    function toonCode() {
+      var url = location.origin + TELEFOON + '?c=' + code;
+      document.getElementById('stCode').textContent = code.slice(0, 3) + ' ' + code.slice(3);
+      document.getElementById('stUitleg').innerHTML =
+        tr('st_uitleg').replace('{u}', location.host + '/s');
+      var qr = document.getElementById('stQr');
+      qr.innerHTML = '';
+      laadQr().then(function () {
+        new QRCode(qr, { text: url, width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M });
+      }).catch(function () { qr.style.display = 'none'; });
+    }
+    function nieuweCode() {
+      return fetch(API + 'nieuw', { method: 'POST' })
+        .then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+        .then(function (j) { code = j.code; toonCode(); zetStatus(false); });
+    }
+    function ontvang(item) {
+      laatste = item;
+      laatsteActie = Date.now();
+      var titel = item.titel || item.url.replace(/^https?:\/\/(www\.)?/, '');
+      document.getElementById('stToastT').textContent = titel;
+      toast.hidden = false;
+      var r = rij(linkFor(item.url), '#6c7cff',
+        '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
+        titel, item.url, tr('openen'), '');
+      lijst.insertBefore(r, lijst.firstChild);
+      // Meteen openen. Blokkeert de browser dat, dan blijft de melding met Openen staan.
+      location.href = linkFor(item.url);
+    }
+    function poll() {
+      clearTimeout(timer);
+      if (!code) return;
+      if (sheet.hidden && Date.now() - laatsteActie > STOP_NA) { stop(); return; }
+      if (document.hidden) { timer = setTimeout(poll, 5000); return; }
+      fetch(API + code, { cache: 'no-store' }).then(function (r) {
+        if (r.status === 404) return nieuweCode().then(function () { return { items: [] }; });
+        if (!r.ok) throw r.status;
+        return r.json();
+      }).then(function (j) {
+        zetStatus(false);
+        (j.items || []).forEach(ontvang);
+      }).catch(function () { zetStatus(true); })
+        .then(function () { timer = setTimeout(poll, sheet.hidden ? 5000 : 2500); });
+    }
+    function stop() { clearTimeout(timer); code = null; btn.classList.remove('actief'); }
+    function open() {
+      sheet.hidden = false;
+      laatsteActie = Date.now();
+      btn.classList.add('actief');
+      if (code) { toonCode(); poll(); return; }
+      zetStatus(false);
+      nieuweCode().then(poll).catch(function () { zetStatus(true); });
+    }
+    function dicht() { sheet.hidden = true; laatsteActie = Date.now(); }
+
+    document.getElementById('stTitel').textContent = tr('stuur');
+    btn.title = tr('stuur'); btn.setAttribute('aria-label', tr('stuur'));
+    document.getElementById('stToastK').textContent = tr('st_ontvangen');
+    document.getElementById('stToastOpen').textContent = tr('openen');
+    btn.addEventListener('click', open);
+    document.getElementById('stClose').addEventListener('click', dicht);
+    sheet.addEventListener('click', function (ev) { if (ev.target === sheet) dicht(); });
+    document.getElementById('stToastX').addEventListener('click', function () { toast.hidden = true; });
+    document.getElementById('stToastOpen').addEventListener('click', function () {
+      toast.hidden = true;
+      if (laatste) location.href = linkFor(laatste.url);
+    });
+  })();
 })();
 </script>
 </body>

@@ -859,12 +859,6 @@
   footer { padding-right: calc(4 * 72px); }
   #lpBtn, #stBtn { display: inline-flex; }
   body.editing #lpBtn, body.editing #stBtn { display: none; }
-  #stBtn .dot {
-    position: absolute; top: 9px; right: 9px; width: 9px; height: 9px; border-radius: 50%;
-    background: #6fe08a; box-shadow: 0 0 0 2px rgba(0,0,0,.4); display: none;
-  }
-  #stBtn { position: relative; }
-  #stBtn.actief .dot { display: block; }
 
   .lp-title, .st-title { font-size: clamp(24px,2.8vw,34px); font-weight: 650; letter-spacing: -.02em; }
   .lp-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px; }
@@ -1253,7 +1247,6 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="2" y="4" width="9" height="16" rx="2"/><path d="M14 12h8M18.5 8.5 22 12l-3.5 3.5"/>
     </svg>
-    <span class="dot"></span>
   </button>
   <button class="btn icon glass" id="ambBtn" title="Sluimerstand" aria-label="Sluimerstand">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -4222,11 +4215,10 @@
       }).catch(function () { zetStatus(true); })
         .then(function () { timer = setTimeout(poll, sheet.hidden ? 5000 : 2500); });
     }
-    function stop() { clearTimeout(timer); code = null; btn.classList.remove('actief'); }
+    function stop() { clearTimeout(timer); code = null; }
     function open() {
       sheet.hidden = false;
       laatsteActie = Date.now();
-      btn.classList.add('actief');
       if (code) { toonCode(); poll(); return; }
       zetStatus(false);
       nieuweCode().then(poll).catch(function () { zetStatus(true); });

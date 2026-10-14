@@ -116,23 +116,10 @@
     <div class="uitleg">
       <p style="margin:0">Deel een link vanuit YouTube, je browser of een andere app rechtstreeks naar de auto. De laatst gebruikte code wordt onthouden.</p>
       <div id="android">
-        <h3>Android</h3>
         <ol>
           <li>Installeer deze pagina als app<span id="instWrap" hidden>: <br><button type="button" id="installeer">Installeer app</button></span><span id="instMenu">: menu <b>⋮</b> → <b>App installeren</b> (of <b>Toevoegen aan startscherm</b>).</span></li>
           <li>Kies bij <b>Delen</b> in een app voortaan <b>Naar Tesla</b>.</li>
         </ol>
-      </div>
-      <div id="iphone">
-        <h3>iPhone (Opdrachten)</h3>
-        <ol>
-          <li>Open de app <b>Opdrachten</b>, tik op <b>+</b> en noem hem <b>Naar Tesla</b>.</li>
-          <li>Tik op <b>ⓘ</b> en zet <b>Toon in deelpaneel</b> aan.</li>
-          <li>Tik bij <b>Ontvang</b> op de invoertypes en zet <b>URL's</b> en <b>Tekst</b> aan.</li>
-          <li>Voeg <b>URL</b> toe: <code>https://theater.damver.nl/stuur/#</code> met direct daarachter <b>Invoer opdracht</b>.</li>
-          <li>Voeg <b>Open URL's</b> toe.</li>
-          <li>Open deze pagina één keer in <b>Safari</b> en vul de code in, dan onthoudt Safari hem.</li>
-        </ol>
-        <p style="margin:10px 0 0">Kies daarna bij <b>Delen</b> in een app <b>Naar Tesla</b>: Safari opent en verstuurt de link meteen.</p>
       </div>
     </div>
   </details>
@@ -153,15 +140,11 @@
   function toonCode(c) { codeEl.value = c.length > 3 ? c : c; }
   var q = new URLSearchParams(location.search);
   var uitUrl = schoon(q.get('c'));
-  // gedeeld vanuit een app (Android share target of iPhone-opdracht)
-  // Een iPhone-opdracht zet de link liefst ongecodeerd achter #; dat heeft geen Codeer-stap nodig.
-  // Opdrachten codeert de link soms dubbel (https%253A...); blijven decoderen tot hij niet meer verandert.
-  var hash = location.hash.slice(1);
-  for (var i = 0; i < 4; i++) { try { var d = decodeURIComponent(hash); if (d === hash) break; hash = d; } catch (e) { break; } }
-  var gedeeld = [q.get('url'), q.get('text'), q.get('title'), hash].filter(Boolean).join(' ');
+  // gedeeld vanuit een app (Android share target)
+  var gedeeld = [q.get('url'), q.get('text'), q.get('title')].filter(Boolean).join(' ');
   if (uitUrl) { st.code = uitUrl; bewaar(); }
-  var viaDelen = q.has('url') || q.has('text') || location.href.indexOf('#') >= 0;
-  if (location.search || location.hash) history.replaceState(null, '', location.pathname);
+  var viaDelen = q.has('url') || q.has('text');
+  if (location.search) history.replaceState(null, '', location.pathname);
   toonCode(st.code || '');
   codeEl.addEventListener('input', function () { var c = schoon(codeEl.value); toonCode(c); st.code = c; bewaar(); });
 
@@ -219,13 +202,11 @@
     if (schoon(st.code).length === 6) document.getElementById('form').requestSubmit();
     else { melding('Vul de code uit de auto in en tik op Versturen.'); codeEl.focus(); }
   }
-  else if (viaDelen) melding('Er kwam geen bruikbare link mee vanuit de opdracht' + (gedeeld ? ': ' + gedeeld.slice(0, 120) : '.'), 'fout');
+  else if (viaDelen) melding('Er kwam geen bruikbare link mee' + (gedeeld ? ': ' + gedeeld.slice(0, 120) : '.'), 'fout');
 
-  // installeren als app (Android/Chrome); iPhone krijgt de opdracht-uitleg
+  // installeren als app voor het deelmenu; kan alleen op Android
   var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  document.getElementById(ios ? 'android' : 'iphone').hidden = true;
-  var standalone = matchMedia('(display-mode: standalone)').matches;
-  if (standalone && !ios) document.getElementById('delen').hidden = true;
+  if (ios || matchMedia('(display-mode: standalone)').matches) document.getElementById('delen').hidden = true;
   var prompt = null;
   addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault(); prompt = e;

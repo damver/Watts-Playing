@@ -155,10 +155,12 @@
   var uitUrl = schoon(q.get('c'));
   // gedeeld vanuit een app (Android share target of iPhone-opdracht)
   // Een iPhone-opdracht zet de link liefst ongecodeerd achter #; dat heeft geen Codeer-stap nodig.
+  // Opdrachten codeert de link soms dubbel (https%253A...); blijven decoderen tot hij niet meer verandert.
   var hash = location.hash.slice(1);
-  try { hash = decodeURIComponent(hash); } catch (e) {}
+  for (var i = 0; i < 4; i++) { try { var d = decodeURIComponent(hash); if (d === hash) break; hash = d; } catch (e) { break; } }
   var gedeeld = [q.get('url'), q.get('text'), q.get('title'), hash].filter(Boolean).join(' ');
   if (uitUrl) { st.code = uitUrl; bewaar(); }
+  var viaDelen = q.has('url') || q.has('text') || location.href.indexOf('#') >= 0;
   if (location.search || location.hash) history.replaceState(null, '', location.pathname);
   toonCode(st.code || '');
   codeEl.addEventListener('input', function () { var c = schoon(codeEl.value); toonCode(c); st.code = c; bewaar(); });
@@ -217,7 +219,7 @@
     if (schoon(st.code).length === 6) document.getElementById('form').requestSubmit();
     else { melding('Vul de code uit de auto in en tik op Versturen.'); codeEl.focus(); }
   }
-  else if (q.has('url') || q.has('text') || location.href.indexOf('#') >= 0) melding('Er kwam geen link mee vanuit de opdracht. Controleer bij Ontvang dat URL\'s aan staat.', 'fout');
+  else if (viaDelen) melding('Er kwam geen bruikbare link mee vanuit de opdracht' + (gedeeld ? ': ' + gedeeld.slice(0, 120) : '.'), 'fout');
 
   // installeren als app (Android/Chrome); iPhone krijgt de opdracht-uitleg
   var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);

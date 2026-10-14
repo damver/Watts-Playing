@@ -127,8 +127,8 @@
         <ol>
           <li>Open de app <b>Opdrachten</b>, tik op <b>+</b> en noem hem <b>Naar Tesla</b>.</li>
           <li>Tik op <b>ⓘ</b> en zet <b>Toon in deelpaneel</b> aan.</li>
-          <li>Voeg <b>Codeer URL</b> toe met <b>Opdrachtinvoer</b>.</li>
-          <li>Voeg <b>URL</b> toe: <code>https://theater.damver.nl/stuur/?url=</code> met daarachter <b>Gecodeerde URL</b>.</li>
+          <li>Tik bij <b>Ontvang</b> op de invoertypes en zet <b>URL's</b> en <b>Tekst</b> aan.</li>
+          <li>Voeg <b>URL</b> toe: <code>https://theater.damver.nl/stuur/#</code> met direct daarachter <b>Invoer opdracht</b>.</li>
           <li>Voeg <b>Open URL's</b> toe.</li>
           <li>Open deze pagina één keer in <b>Safari</b> en vul de code in, dan onthoudt Safari hem.</li>
         </ol>
@@ -154,9 +154,12 @@
   var q = new URLSearchParams(location.search);
   var uitUrl = schoon(q.get('c'));
   // gedeeld vanuit een app (Android share target of iPhone-opdracht)
-  var gedeeld = [q.get('url'), q.get('text'), q.get('title')].filter(Boolean).join(' ');
+  // Een iPhone-opdracht zet de link liefst ongecodeerd achter #; dat heeft geen Codeer-stap nodig.
+  var hash = location.hash.slice(1);
+  try { hash = decodeURIComponent(hash); } catch (e) {}
+  var gedeeld = [q.get('url'), q.get('text'), q.get('title'), hash].filter(Boolean).join(' ');
   if (uitUrl) { st.code = uitUrl; bewaar(); }
-  if (location.search) history.replaceState(null, '', location.pathname);
+  if (location.search || location.hash) history.replaceState(null, '', location.pathname);
   toonCode(st.code || '');
   codeEl.addEventListener('input', function () { var c = schoon(codeEl.value); toonCode(c); st.code = c; bewaar(); });
 
@@ -214,7 +217,7 @@
     if (schoon(st.code).length === 6) document.getElementById('form').requestSubmit();
     else { melding('Vul de code uit de auto in en tik op Versturen.'); codeEl.focus(); }
   }
-  else if (q.has('url') || q.has('text')) melding('Er kwam geen link mee. Controleer in de opdracht dat Codeer URL de Invoer opdracht gebruikt.', 'fout');
+  else if (q.has('url') || q.has('text') || location.href.indexOf('#') >= 0) melding('Er kwam geen link mee vanuit de opdracht. Controleer bij Ontvang dat URL\'s aan staat.', 'fout');
 
   // installeren als app (Android/Chrome); iPhone krijgt de opdracht-uitleg
   var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);

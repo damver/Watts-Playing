@@ -214,6 +214,7 @@
     if (schoon(st.code).length === 6) document.getElementById('form').requestSubmit();
     else { melding('Vul de code uit de auto in en tik op Versturen.'); codeEl.focus(); }
   }
+  else if (q.has('url') || q.has('text')) melding('Er kwam geen link mee. Controleer in de opdracht dat Codeer URL de Invoer opdracht gebruikt.', 'fout');
 
   // installeren als app (Android/Chrome); iPhone krijgt de opdracht-uitleg
   var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);

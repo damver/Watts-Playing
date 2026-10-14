@@ -227,7 +227,11 @@
     document.getElementById('instWrap').hidden = false; document.getElementById('instMenu').hidden = true;
   });
   document.getElementById('installeer').addEventListener('click', function () { if (prompt) { prompt.prompt(); prompt = null; } });
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/stuur/sw.js', { scope: '/stuur/' }).catch(function () {});
+  // Alleen Android heeft de service worker nodig (installeren + deelmenu); op iPhone zat hij alleen maar in de weg.
+  if ('serviceWorker' in navigator) {
+    if (ios) navigator.serviceWorker.getRegistrations().then(function (r) { r.forEach(function (x) { x.unregister(); }); });
+    else navigator.serviceWorker.register('/stuur/sw.js', { scope: '/stuur/' }).catch(function () {});
+  }
 })();
 </script>
 </body>

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#07070c">
 <title>Stuur naar auto — Watt's Playing</title>
+<link rel="manifest" href="/stuur/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/logos/logo-180.png">
+<meta name="apple-mobile-web-app-title" content="Naar Tesla">
 <style>
   @font-face { font-family: 'TeslaTitle'; src: url('/fonts/tesla.ttf') format('truetype'); font-display: swap; }
   @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
@@ -63,6 +66,17 @@
   .geschiedenis li { padding: 12px 2px; border-top: 1px solid rgba(255,255,255,.1); color: var(--dim); font-size: 14px; cursor: pointer;
                       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .geschiedenis li:first-child { border-top: 0; padding-top: 2px; }
+  details.kaart { padding: 0; }
+  summary { list-style: none; cursor: pointer; padding: 18px; font-weight: 650; display: flex; align-items: center; gap: 10px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: ""; margin-left: auto; width: 9px; height: 9px; border-right: 2px solid var(--dim); border-bottom: 2px solid var(--dim); transform: rotate(45deg); transition: transform .2s; }
+  details[open] summary::after { transform: rotate(225deg); }
+  .uitleg { padding: 0 18px 18px; color: var(--dim); font-size: 15px; }
+  .uitleg h3 { color: var(--text); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin: 14px 0 6px; }
+  .uitleg ol { margin: 0; padding-left: 20px; } .uitleg li { margin: 4px 0; }
+  .uitleg b { color: var(--text); font-weight: 600; }
+  .uitleg code { color: var(--text); background: rgba(0,0,0,.3); border-radius: 6px; padding: 1px 6px; font-size: 13px; word-break: break-all; }
+  .uitleg button { margin-top: 10px; min-height: 46px; font-size: 15px; }
   .klein { color: var(--dim); font-size: 13px; margin: 18px 12px 0; text-align: center; }
 </style>
 </head>
@@ -97,6 +111,32 @@
     <ul class="geschiedenis" id="gesch"></ul>
   </div>
 
+  <details class="kaart glass" id="delen">
+    <summary>Direct delen vanuit apps</summary>
+    <div class="uitleg">
+      <p style="margin:0">Deel een link vanuit YouTube, je browser of een andere app rechtstreeks naar de auto. De laatst gebruikte code wordt onthouden.</p>
+      <div id="android">
+        <h3>Android</h3>
+        <ol>
+          <li>Installeer deze pagina als app<span id="instWrap" hidden>: <br><button type="button" id="installeer">Installeer app</button></span><span id="instMenu">: menu <b>⋮</b> → <b>App installeren</b> (of <b>Toevoegen aan startscherm</b>).</span></li>
+          <li>Kies bij <b>Delen</b> in een app voortaan <b>Naar Tesla</b>.</li>
+        </ol>
+      </div>
+      <div id="iphone">
+        <h3>iPhone (Opdrachten)</h3>
+        <ol>
+          <li>Open de app <b>Opdrachten</b>, tik op <b>+</b> en noem hem <b>Naar Tesla</b>.</li>
+          <li>Tik op <b>ⓘ</b> en zet <b>Toon in deelpaneel</b> aan.</li>
+          <li>Voeg <b>Codeer URL</b> toe met <b>Opdrachtinvoer</b>.</li>
+          <li>Voeg <b>URL</b> toe: <code>https://theater.damver.nl/stuur/?url=</code> met daarachter <b>Gecodeerde URL</b>.</li>
+          <li>Voeg <b>Open URL's</b> toe.</li>
+          <li>Open deze pagina één keer in <b>Safari</b> en vul de code in, dan onthoudt Safari hem.</li>
+        </ol>
+        <p style="margin:10px 0 0">Kies daarna bij <b>Delen</b> in een app <b>Naar Tesla</b>: Safari opent en verstuurt de link meteen.</p>
+      </div>
+    </div>
+  </details>
+
   <p class="klein">Er wordt niets bewaard: de link staat alleen even klaar tot de auto hem ophaalt.</p>
 </main>
 <script>
@@ -111,8 +151,12 @@
 
   function schoon(c) { return (c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); }
   function toonCode(c) { codeEl.value = c.length > 3 ? c : c; }
-  var uitUrl = schoon(new URLSearchParams(location.search).get('c'));
-  if (uitUrl) { st.code = uitUrl; bewaar(); history.replaceState(null, '', location.pathname); }
+  var q = new URLSearchParams(location.search);
+  var uitUrl = schoon(q.get('c'));
+  // gedeeld vanuit een app (Android share target of iPhone-opdracht)
+  var gedeeld = [q.get('url'), q.get('text'), q.get('title')].filter(Boolean).join(' ');
+  if (uitUrl) { st.code = uitUrl; bewaar(); }
+  if (location.search) history.replaceState(null, '', location.pathname);
   toonCode(st.code || '');
   codeEl.addEventListener('input', function () { var c = schoon(codeEl.value); toonCode(c); st.code = c; bewaar(); });
 
@@ -165,6 +209,24 @@
       melding(e.message && e.message.indexOf('fetch') < 0 ? e.message : 'Geen verbinding.', 'fout');
     }).then(function () { knop.disabled = false; });
   });
+  if (gedeeld && vindLink(gedeeld)) {
+    linkEl.value = vindLink(gedeeld);
+    if (schoon(st.code).length === 6) document.getElementById('form').requestSubmit();
+    else { melding('Vul de code uit de auto in en tik op Versturen.'); codeEl.focus(); }
+  }
+
+  // installeren als app (Android/Chrome); iPhone krijgt de opdracht-uitleg
+  var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  document.getElementById(ios ? 'android' : 'iphone').hidden = true;
+  var standalone = matchMedia('(display-mode: standalone)').matches;
+  if (standalone && !ios) document.getElementById('delen').hidden = true;
+  var prompt = null;
+  addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); prompt = e;
+    document.getElementById('instWrap').hidden = false; document.getElementById('instMenu').hidden = true;
+  });
+  document.getElementById('installeer').addEventListener('click', function () { if (prompt) { prompt.prompt(); prompt = null; } });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/stuur/sw.js', { scope: '/stuur/' }).catch(function () {});
 })();
 </script>
 </body>

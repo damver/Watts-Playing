@@ -18,7 +18,7 @@ Games tab — but only stuff you can actually play with taps/swipes, no keyboard
 News tab — headlines from a few sources, tap to read
 Customizable fonts & backgrounds
 Charging break — tap the coffee cup to see food, coffee, groceries and toilets within walking distance of where you're parked (OpenStreetMap data via Photon)
-Send to car — scan the QR code with your phone (or go to `/s` and type the 6-character code), paste a link, and it opens on the car screen right away
+Send to car — scan the QR code with your phone (or go to `/s` and type the 6-character code), paste a link, and it opens on the car screen right away. On Android you can install `/stuur/` as an app and pick it straight from the Share menu; on iPhone the page explains a two-minute Shortcut that does the same
 
 # Help me
 It's been genuinely useful for road trips and Supercharger stops, but I'm sure I'm missing obvious ideas. What would you want on a screen like this? Anything from small quality-of-life stuff to whole new sections. Happy to hear what other Tesla owners actually want while parked/charging.

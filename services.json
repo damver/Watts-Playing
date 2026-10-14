@@ -311,6 +311,12 @@
       "url": "https://www.buienradar.nl/",
       "logo": "logos/buienradar.png",
       "icon": true
+    },
+    {
+      "name": "Discord",
+      "url": "https://discord.com/app",
+      "logo": "logos/discord.png",
+      "icon": true
     }
   ]
 }
